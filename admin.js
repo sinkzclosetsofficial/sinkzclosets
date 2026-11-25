@@ -1048,23 +1048,66 @@ document.addEventListener("DOMContentLoaded", () => {
      14. UPLOAD IMAGES TO SUPABASE STORAGE
      ======================================================= */
 
-  async function uploadProductImages() {
+  function describeSupabaseError(error) {
+    if (!error) return "Unknown upload error.";
 
+    const parts = [];
+
+    if (error.message) parts.push(error.message);
+    if (error.error && error.error !== error.message) parts.push(String(error.error));
+    if (error.statusCode) parts.push("HTTP " + error.statusCode);
+    if (error.status) parts.push("Status " + error.status);
+    if (error.code) parts.push("Code " + error.code);
+
+    return parts.length ? [...new Set(parts)].join(" | ") : String(error);
+  }
+
+  async function uploadProductImages() {
     const uploadedPaths = [];
     const uploadedURLs = [];
 
+    if (!selectedImageFiles.length) {
+      return { uploadedPaths, uploadedURLs };
+    }
+
     try {
+      // An expired or missing session is a common cause of Storage RLS failures.
+      const { data: sessionData, error: sessionError } =
+        await db.auth.getSession();
 
-      for (const item of selectedImageFiles) {
+      if (sessionError) {
+        throw new Error(
+          "Could not verify your admin session before uploading: " +
+          describeSupabaseError(sessionError)
+        );
+      }
 
+      if (!sessionData?.session?.user?.id) {
+        throw new Error(
+          "Your admin session has expired. Sign in again, then retry the image upload."
+        );
+      }
+
+      for (let index = 0; index < selectedImageFiles.length; index++) {
+        const item = selectedImageFiles[index];
         const file = item.file;
 
-        const extension =
-          item.extension || getImageExtension(file, item.contentType);
+        const contentType =
+          item.contentType || getSupportedImageType(file);
 
-        if (!extension) {
+        const extension =
+          item.extension || getImageExtension(file, contentType);
+
+        if (!contentType || !extension) {
           throw new Error(
-            "Could not determine the image format for " + file.name + "."
+            'Unsupported image format for "' + file.name +
+            '". Use JPG, JPEG, PNG or WEBP.'
+          );
+        }
+
+        if (!file.size || file.size > MAX_IMAGE_SIZE) {
+          throw new Error(
+            '"' + file.name + '" must be larger than 0 bytes and no larger than 10 MB.'
           );
         }
 
@@ -1072,51 +1115,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showMessage(
           "imageUploadMessage",
-          `Uploading ${file.name}...`,
+          `Uploading image ${index + 1} of ${selectedImageFiles.length}: ${file.name}`,
           "info"
         );
 
-        const { error: uploadError } = await db.storage
+        const { data: uploadData, error: uploadError } = await db.storage
           .from(STORAGE_BUCKET)
           .upload(path, file, {
             cacheControl: "3600",
             upsert: false,
-            contentType: item.contentType
+            contentType
           });
 
         if (uploadError) {
           throw new Error(
-            `Could not upload "${file.name}": ${uploadError.message}`
+            'Upload failed for "' + file.name + '": ' +
+            describeSupabaseError(uploadError) +
+            ". Check that this signed-in administrator has active upload permission " +
+            "for the " + STORAGE_BUCKET + " bucket."
           );
         }
 
-        uploadedPaths.push(path);
+        const savedPath = uploadData?.path || path;
+        uploadedPaths.push(savedPath);
 
-        const { data } = db.storage
+        const { data: publicData } = db.storage
           .from(STORAGE_BUCKET)
-          .getPublicUrl(path);
+          .getPublicUrl(savedPath);
 
-        const publicURL = safeImageURL(data?.publicUrl);
+        const publicURL = safeImageURL(publicData?.publicUrl);
 
         if (!publicURL) {
           throw new Error(
-            `Uploaded "${file.name}", but a valid public URL was not returned.`
+            'The file "' + file.name +
+            '" uploaded, but Supabase did not return a valid public URL.'
           );
         }
 
         uploadedURLs.push(publicURL);
       }
 
-      return {
-        uploadedPaths,
-        uploadedURLs
-      };
+      showMessage(
+        "imageUploadMessage",
+        `${uploadedURLs.length} image(s) uploaded. Saving product details...`,
+        "success"
+      );
+
+      return { uploadedPaths, uploadedURLs };
 
     } catch (error) {
-
-      // Clean up only files uploaded during this failed attempt.
+      // Remove only objects created by this incomplete upload attempt.
       await removeUploadedFiles(uploadedPaths);
-
       throw error;
     }
   }
