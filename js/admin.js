@@ -19,13 +19,7 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 const STORAGE_BUCKET = "sinkzclosets-products";
 
-const ADMIN_USERNAME = "josiassinkonde";
 
-const EXISTING_ADMIN_EMAIL =
-  "josiassinkonde96@gmail.com";
-
-const OWNER_EMAIL =
-  "lungumordenconstruction.info@gmail.com";
 
 // Match the Supabase bucket's 10 MB per-file upload limit.
 // There is no artificial per-product image-count limit.
@@ -411,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setText(
       "adminIdentity",
-      currentUser?.email || ADMIN_USERNAME
+      currentUser?.email || "Administrator"
     );
 
     loadDashboardData();
@@ -458,16 +452,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showDashboard();
   }
 
-  function getLoginEmail(value) {
-    const entered = String(value || "").trim().toLowerCase();
-
-    if (entered === ADMIN_USERNAME) {
-      return EXISTING_ADMIN_EMAIL;
-    }
-
-    return entered;
-  }
-
   loginForm?.addEventListener("submit", async event => {
     event.preventDefault();
 
@@ -477,7 +461,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!enteredEmail || !password) {
       showMessage(
         "loginMessage",
-        "Enter your administrator username or email and password.",
+        "Enter your administrator email address and password.",
         "error"
       );
 
@@ -496,7 +480,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showMessage("loginMessage", "Checking your account...");
 
     try {
-      const email = getLoginEmail(enteredEmail);
+      const email = String(enteredEmail || "").trim().toLowerCase();
 
       const { data, error } = await db.auth.signInWithPassword({
         email,
@@ -2067,9 +2051,16 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (
-      currentUser.email?.toLowerCase() === OWNER_EMAIL.toLowerCase()
-    ) {
+    const requestedEmail = String($("newAdminEmail")?.value || "")
+      .trim()
+      .toLowerCase();
+
+    if (!requestedEmail || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(requestedEmail)) {
+      showMessage("adminAccountMessage", "Enter a valid new email address.", "error");
+      return;
+    }
+
+    if (currentUser.email?.toLowerCase() === requestedEmail) {
       showMessage(
         "adminAccountMessage",
         "This account already uses the requested email.",
@@ -2080,7 +2071,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const confirmed = confirm(
-      `Request an email change to ${OWNER_EMAIL}? Supabase may send a confirmation email before the change takes effect.`
+      `Request an email change to ${requestedEmail}? Supabase may send a confirmation email before the change takes effect.`
     );
 
     if (!confirmed) return;
@@ -2093,7 +2084,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
 
       const { data, error } = await db.auth.updateUser({
-        email: OWNER_EMAIL
+        email: requestedEmail
       });
 
       if (error) throw error;
@@ -2123,7 +2114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  setText("currentAdminEmail", EXISTING_ADMIN_EMAIL);
+  setText("currentAdminEmail", currentUser?.email || "Not signed in");
 
 
   /* =======================================================
