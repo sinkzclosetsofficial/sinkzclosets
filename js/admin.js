@@ -2084,7 +2084,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
 
-      const { data, error } = await db.auth.updateUser({
+      const { error } = await db.auth.updateUser({
         email: requestedEmail
       });
 
@@ -2095,8 +2095,6 @@ document.addEventListener("DOMContentLoaded", () => {
         "Email change requested. Check the confirmation email sent by Supabase. Your current login email remains active until the change is confirmed.",
         "success"
       );
-
-      console.log("Email update response:", data);
 
     } catch (error) {
 
