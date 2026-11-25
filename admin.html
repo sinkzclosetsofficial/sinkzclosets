@@ -1111,10 +1111,10 @@ input[type="checkbox"] {
         Sign in to the SINKZCLOSETS management workspace.
       </p>
 
-      <label for="adminEmail">Administrator username or email</label>
-      <input id="adminEmail" name="email" type="text"
+      <label for="adminEmail">Administrator email address</label>
+      <input id="adminEmail" name="email" type="email"
         autocomplete="username"
-        placeholder="Enter administrator username" required>
+        placeholder="Enter administrator email" required>
 
       <label for="adminPassword">Password</label>
       <input id="adminPassword" name="password" type="password"
@@ -1806,13 +1806,17 @@ input[type="checkbox"] {
           <section class="admin-panel">
             <h3>Administrator account</h3>
             <p class="muted">
-              Change the administrator login email through Supabase's authenticated email-change process. Email confirmation may be required.
+              Change the signed-in administrator's email through Supabase's authenticated email-change process. Supabase may require confirmation at the current and new email addresses.
             </p>
 
             <p>Current administrator: <strong id="currentAdminEmail">Not signed in</strong></p>
 
+            <label for="newAdminEmail">New administrator email address</label>
+            <input id="newAdminEmail" type="email" autocomplete="email"
+              placeholder="Enter the new email address">
+
             <button type="button" id="changeAdminEmailButton" class="secondary-button">
-              Request administrator email change
+              Request email change
             </button>
 
             <p id="adminAccountMessage" class="form-message"
