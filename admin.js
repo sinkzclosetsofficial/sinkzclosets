@@ -27,14 +27,21 @@ const EXISTING_ADMIN_EMAIL =
 const OWNER_EMAIL =
   "lungumordenconstruction.info@gmail.com";
 
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-const MAX_PRODUCT_IMAGES = 10;
+// Match the Supabase bucket's 10 MB per-file upload limit.
+// There is no artificial per-product image-count limit.
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 
 const ALLOWED_IMAGE_TYPES = {
   jpg: "image/jpeg",
   jpeg: "image/jpeg",
   png: "image/png",
   webp: "image/webp"
+};
+
+const IMAGE_EXTENSION_BY_TYPE = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp"
 };
 
 
@@ -174,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cleaned.unshift(mainImage);
     }
 
-    return [...new Set(cleaned)].slice(0, MAX_PRODUCT_IMAGES);
+    return [...new Set(cleaned)];
   }
 
 
@@ -911,12 +918,42 @@ document.addEventListener("DOMContentLoaded", () => {
      ======================================================= */
 
   function getSupportedImageType(file) {
-    const extension = String(file.name || "")
-      .split(".")
-      .pop()
+    // Prefer the browser's MIME type. Android gallery providers
+    // sometimes give files extensionless names or a generic filename.
+    let mimeType = String(file?.type || "")
+      .split(";")[0]
+      .trim()
       .toLowerCase();
 
+    if (mimeType === "image/jpg") {
+      mimeType = "image/jpeg";
+    }
+
+    if (Object.values(ALLOWED_IMAGE_TYPES).includes(mimeType)) {
+      return mimeType;
+    }
+
+    // Fall back to the extension when Android reports an empty or
+    // generic MIME type such as application/octet-stream.
+    const filename = String(file?.name || "");
+    const extension = filename.includes(".")
+      ? filename.split(".").pop().toLowerCase()
+      : "";
+
     return ALLOWED_IMAGE_TYPES[extension] || null;
+  }
+
+  function getImageExtension(file, contentType) {
+    const filename = String(file?.name || "");
+    const extension = filename.includes(".")
+      ? filename.split(".").pop().toLowerCase()
+      : "";
+
+    if (ALLOWED_IMAGE_TYPES[extension] === contentType) {
+      return extension;
+    }
+
+    return IMAGE_EXTENSION_BY_TYPE[contentType] || null;
   }
 
   $("adminProductImages")?.addEventListener("change", event => {
@@ -932,13 +969,9 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const file of files) {
 
       const contentType = getSupportedImageType(file);
+      const extension = getImageExtension(file, contentType);
 
-      // IMPORTANT:
-      // Android may report application/octet-stream or an empty
-      // MIME type for a genuine image. The recognised extension
-      // is used instead of rejecting the file based on file.type.
-
-      if (!contentType) {
+      if (!contentType || !extension) {
         rejected.push(
           `${file.name}: unsupported format. Use JPG, JPEG, PNG or WEBP.`
         );
@@ -952,7 +985,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (file.size > MAX_IMAGE_SIZE) {
-        rejected.push(`${file.name}: larger than 5 MB.`);
+        rejected.push(`${file.name}: larger than 10 MB.`);
         continue;
       }
 
@@ -963,17 +996,6 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       if (duplicate) continue;
-
-      if (
-        currentProductImages.length +
-        selectedImageFiles.length >= MAX_PRODUCT_IMAGES
-      ) {
-        rejected.push(
-          `Maximum of ${MAX_PRODUCT_IMAGES} images per product reached.`
-        );
-
-        break;
-      }
 
       let preview;
 
@@ -992,6 +1014,7 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedImageFiles.push({
         file,
         contentType,
+        extension,
         preview
       });
 
@@ -1051,10 +1074,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const file = item.file;
 
-        const extension = file.name
-          .split(".")
-          .pop()
-          .toLowerCase();
+        const extension =
+          item.extension || getImageExtension(file, item.contentType);
+
+        if (!extension) {
+          throw new Error(
+            "Could not determine the image format for " + file.name + "."
+          );
+        }
 
         const path = `products/${makeId()}.${extension}`;
 
@@ -1253,19 +1280,6 @@ document.addEventListener("DOMContentLoaded", () => {
       showMessage(
         "productMessage",
         "Enter a valid ZAR price or leave it blank.",
-        "error"
-      );
-
-      return;
-    }
-
-    if (
-      currentProductImages.length +
-      selectedImageFiles.length > MAX_PRODUCT_IMAGES
-    ) {
-      showMessage(
-        "productMessage",
-        `A product can have a maximum of ${MAX_PRODUCT_IMAGES} images.`,
         "error"
       );
 
