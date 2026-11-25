@@ -1161,6 +1161,7 @@ input[type="checkbox"] {
         <button class="admin-nav-item" data-section="announcementsSection">▤ <span>Announcements</span></button>
         <button class="admin-nav-item" data-section="storefrontSection">⌂ <span>Storefront</span></button>
         <button class="admin-nav-item" data-section="settingsSection">⚙ <span>Settings</span></button>
+        <button class="admin-nav-item" data-section="securitySection">⌑ <span>Cyber Security</span></button>
       </nav>
 
       <div class="sidebar-bottom">
@@ -1821,6 +1822,70 @@ input[type="checkbox"] {
 
             <p id="adminAccountMessage" class="form-message"
               role="status" aria-live="polite"></p>
+          </section>
+        </section>
+
+
+        <!-- 16. CYBER THREAT INDICATORS -->
+        <section id="securitySection" class="admin-section" hidden>
+          <div class="section-heading">
+            <div>
+              <h2>Cyber Threat Monitoring</h2>
+              <span>Threat indicators and monitoring coverage.</span>
+            </div>
+            <span class="status pending">Live telemetry not connected</span>
+          </div>
+
+          <section class="admin-panel">
+            <h3>Monitoring status</h3>
+            <p class="muted">
+              This is the initial indicator register, not a live intrusion-detection system.
+              No attack counts or clean-security status are being fabricated. Indicators below
+              remain unmonitored until trusted event logs and detection rules are connected.
+            </p>
+            <p><strong>Current coverage:</strong> Indicator catalogue installed; automated event collection and alerting are not connected.</p>
+            <p><strong>Review cadence:</strong> Monthly security review, including these indicators.</p>
+          </section>
+
+          <section class="admin-panel">
+            <h3>1. Administrator identity and access</h3>
+            <p class="muted">Watch for repeated failed logins, unusual sign-in locations or times, unexpected concurrent sessions, inactive administrator access, unexpected administrator creation, and role or permission changes.</p>
+            <span class="status pending">Not yet monitored in dashboard</span>
+          </section>
+
+          <section class="admin-panel">
+            <h3>2. Database and API security</h3>
+            <p class="muted">Watch for denied RLS operations, unauthorized write attempts, unusual read volume, suspicious RPC execution, SQL-injection patterns, and unexpected schema, policy or grant changes.</p>
+            <span class="status pending">Not yet monitored in dashboard</span>
+          </section>
+
+          <section class="admin-panel">
+            <h3>3. Storefront and checkout security</h3>
+            <p class="muted">Watch for bot-like traffic spikes, repeated path probing, suspected XSS or injection payloads, price or quantity mismatches, abnormal order bursts, and denial-of-service indicators.</p>
+            <span class="status pending">Not yet monitored in dashboard</span>
+          </section>
+
+          <section class="admin-panel">
+            <h3>4. Storage and file security</h3>
+            <p class="muted">Watch for unexpected uploads, disallowed file types, suspicious file sizes, unusual image replacement, deletion or download activity, and bucket or object-policy changes.</p>
+            <span class="status pending">Not yet monitored in dashboard</span>
+          </section>
+
+          <section class="admin-panel">
+            <h3>5. GitHub and source-code integrity</h3>
+            <p class="muted">Watch for unexpected commits to main, changes to authentication or authorization code, collaborator or token changes, workflow or deployment configuration changes, and exposed private credentials.</p>
+            <span class="status pending">Not yet monitored in dashboard</span>
+          </section>
+
+          <section class="admin-panel">
+            <h3>Severity guide</h3>
+            <div class="activity-list">
+              <p><span class="status inactive">Critical</span> Confirmed unauthorized administrator access, exposed secret credentials, privilege escalation or data theft.</p>
+              <p><span class="status pending">High</span> Credible account compromise or suspicious database modification.</p>
+              <p><span class="status">Medium</span> Repeated access violations, abnormal traffic or suspicious uploads.</p>
+              <p><span class="status active">Low</span> Isolated failed requests or routine scanning attempts.</p>
+            </div>
+            <p class="muted">Severity is based on evidence and impact. A suspicious signal is not automatically proof of compromise. Missing logs mean “not monitored”, not “no threats”.</p>
           </section>
         </section>
 
