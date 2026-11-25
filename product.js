@@ -37,6 +37,22 @@
             ? window.SinkzStore.getProduct(productId)
             : null;
 
+        if (!product) {
+
+        window.addEventListener("sinkz:products-updated", function (event) {
+            if (
+                event.detail &&
+                event.detail.source === "supabase" &&
+                window.SinkzStore &&
+                window.SinkzStore.getProduct(productId) &&
+                !productDetails?.dataset.catalogueLoaded
+            ) {
+                window.location.reload();
+            }
+        }, { once: true });
+
+        }
+
         // -------------------------------------------------
         // 4. HANDLE MISSING PRODUCT
         // -------------------------------------------------
@@ -58,6 +74,10 @@
         // 5. DISPLAY PRODUCT INFORMATION
         // -------------------------------------------------
 
+        if (productDetails) {
+            productDetails.dataset.catalogueLoaded = "true";
+        }
+
         productName.textContent = product.name;
         productCategory.textContent = product.category;
         productPrice.textContent =
@@ -65,12 +85,28 @@
 
         productDescription.textContent = product.description;
 
-        if (product.image) {
+        const productImageURL =
+            product.image ||
+            (
+                Array.isArray(product.images) &&
+                product.images.find(url =>
+                    typeof url === "string" && url.trim()
+                )
+            ) ||
+            "";
+
+        if (productImageURL) {
 
             const image = document.createElement("img");
 
-            image.src = product.image;
+            image.src = productImageURL;
             image.alt = product.name;
+            image.loading = "eager";
+
+            image.onerror = function () {
+                image.remove();
+                productImage.textContent = "Product image unavailable";
+            };
 
             productImage.textContent = "";
             productImage.appendChild(image);

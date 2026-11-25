@@ -338,16 +338,35 @@
         // =================================================
 
         function getProductImage(product) {
+            if (
+                typeof product.image === "string" &&
+                product.image.trim()
+            ) {
+                return product.image.trim();
+            }
 
-            if (product.image) {
-                return product.image;
+            if (Array.isArray(product.images)) {
+                const firstValidImage = product.images.find(function (url) {
+                    return typeof url === "string" && url.trim();
+                });
+
+                return firstValidImage ? firstValidImage.trim() : "";
             }
 
             if (
-                Array.isArray(product.images) &&
-                product.images.length > 0
+                typeof product.images === "string" &&
+                product.images.trim()
             ) {
-                return product.images[0];
+                try {
+                    const parsed = JSON.parse(product.images);
+                    if (Array.isArray(parsed)) {
+                        return parsed.find(url =>
+                            typeof url === "string" && url.trim()
+                        ) || "";
+                    }
+                } catch {
+                    return product.images.trim();
+                }
             }
 
             return "";
