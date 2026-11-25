@@ -1,0 +1,750 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080808">
+  <title>SINKZCLOSETS | Admin Dashboard</title>
+
+  <link rel="stylesheet" href="css/admin.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="js/admin.js"></script>
+</head>
+
+<body>
+
+  <!-- 1. ADMIN LOGIN -->
+  <section id="adminLogin" class="login-screen">
+    <form id="adminLoginForm" class="login-card">
+
+      <a class="login-brand" href="index.html">
+        SINKZ<span>CLOSETS</span>
+      </a>
+
+      <p class="eyebrow">PRIVATE ADMINISTRATION</p>
+      <h1>Welcome back</h1>
+
+      <p class="muted">
+        Sign in to the SINKZCLOSETS management workspace.
+      </p>
+
+      <label for="adminEmail">Administrator username or email</label>
+      <input id="adminEmail" name="email" type="text"
+        autocomplete="username"
+        placeholder="Enter administrator username" required>
+
+      <label for="adminPassword">Password</label>
+      <input id="adminPassword" name="password" type="password"
+        autocomplete="current-password"
+        placeholder="Enter your password" required>
+
+      <button type="button" id="toggleAdminPassword"
+        class="text-button" aria-label="Show password"
+        aria-pressed="false">
+        Show password
+      </button>
+
+      <button type="submit" class="primary-button full-button">
+        Enter dashboard
+      </button>
+
+      <p id="loginMessage" class="form-message"
+        role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+
+  <!-- 2. ADMIN DASHBOARD -->
+  <div id="adminDashboard" class="admin-app" hidden>
+
+    <aside id="adminSidebar" class="admin-sidebar">
+
+      <div class="sidebar-brand">
+        <a href="index.html">SINKZ<span>CLOSETS</span></a>
+        <small>ADMIN WORKSPACE</small>
+      </div>
+
+      <nav class="admin-navigation" aria-label="Admin navigation">
+        <button class="admin-nav-item active" data-section="overviewSection">▦ <span>Overview</span></button>
+        <button class="admin-nav-item" data-section="analyticsSection">▤ <span>Analytics</span></button>
+        <button class="admin-nav-item" data-section="productsSection">▣ <span>Products</span></button>
+        <button class="admin-nav-item" data-section="categoriesSection">▧ <span>Categories</span></button>
+        <button class="admin-nav-item" data-section="inventorySection">▥ <span>Inventory</span></button>
+        <button class="admin-nav-item" data-section="ordersSection">▤ <span>Orders</span></button>
+        <button class="admin-nav-item" data-section="paymentsSection">$ <span>Payments</span></button>
+        <button class="admin-nav-item" data-section="discountsSection">% <span>Discounts</span></button>
+        <button class="admin-nav-item" data-section="customersSection">♙ <span>Customers</span></button>
+        <button class="admin-nav-item" data-section="reviewsSection">☆ <span>Reviews</span></button>
+        <button class="admin-nav-item" data-section="announcementsSection">▤ <span>Announcements</span></button>
+        <button class="admin-nav-item" data-section="storefrontSection">⌂ <span>Storefront</span></button>
+        <button class="admin-nav-item" data-section="settingsSection">⚙ <span>Settings</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <a href="index.html">View storefront ↗</a>
+        <button id="adminLogout" class="logout-button">Log out</button>
+      </div>
+    </aside>
+
+    <div id="sidebarOverlay"></div>
+
+    <main class="admin-main">
+
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button id="adminMenuToggle" class="menu-toggle"
+            aria-label="Open navigation" aria-expanded="false">☰</button>
+
+          <div>
+            <span class="topbar-kicker">SINKZCLOSETS MANAGEMENT</span>
+            <h1 id="currentPageTitle">Overview</h1>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <span id="adminIdentity">Administrator</span>
+          <a href="index.html" class="view-store-link">View shop ↗</a>
+        </div>
+      </header>
+
+      <div class="admin-content">
+
+        <!-- 3. OVERVIEW -->
+        <section id="overviewSection" class="admin-section active">
+          <div class="welcome">
+            <p class="eyebrow">STORE OVERVIEW</p>
+            <h2>Dashboard overview</h2>
+            <p class="subtitle">Monitor your store's products, orders and sales.</p>
+          </div>
+
+          <div class="admin-stat-grid">
+            <article class="admin-stat-card">
+              <p>Total products</p><h2 id="statProducts">0</h2>
+              <span>Catalogue records</span>
+            </article>
+            <article class="admin-stat-card">
+              <p>Total orders</p><h2 id="statOrders">0</h2>
+              <span>Recorded orders</span>
+            </article>
+            <article class="admin-stat-card">
+              <p>Pending orders</p><h2 id="statPendingOrders">0</h2>
+              <span>Awaiting processing</span>
+            </article>
+            <article class="admin-stat-card">
+              <p>Recorded sales</p><h2 id="statSales">ZMW 0.00</h2>
+              <span>Based on recorded orders</span>
+            </article>
+          </div>
+
+          <div class="grid two-columns">
+            <section class="admin-panel">
+              <div class="section-heading">
+                <div><h2>Quick actions</h2><span>Common store-management tasks</span></div>
+              </div>
+              <div class="actions-grid">
+                <button type="button" data-go-section="productsSection">+ Add product</button>
+                <button type="button" data-go-section="ordersSection">Manage orders</button>
+                <button type="button" data-go-section="categoriesSection">Manage categories</button>
+              </div>
+            </section>
+
+            <section class="admin-panel">
+              <div class="section-heading">
+                <div><h2>Recent activity</h2><span>Latest store records</span></div>
+              </div>
+              <div id="overviewRecentActivity" class="activity-list">
+                <p class="empty-message">No activity recorded yet.</p>
+              </div>
+            </section>
+          </div>
+        </section>
+
+
+        <!-- 4. ANALYTICS -->
+        <section id="analyticsSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Store analytics</h2>
+            <span>Store performance information.</span>
+          </div>
+
+          <div class="admin-stat-grid">
+            <article class="admin-stat-card"><p>Page views</p><h2 id="analyticsPageViews">0</h2></article>
+            <article class="admin-stat-card"><p>Unique visitors</p><h2 id="analyticsVisitors">0</h2></article>
+            <article class="admin-stat-card"><p>Product views</p><h2 id="analyticsProductViews">0</h2></article>
+            <article class="admin-stat-card"><p>Add-to-cart events</p><h2 id="analyticsAddToCart">0</h2></article>
+          </div>
+
+          <section class="admin-panel">
+            <div class="section-heading">
+              <h2>Analytics events</h2>
+              <button type="button" id="refreshAnalytics" class="secondary-button">Refresh metrics</button>
+            </div>
+            <div class="table-container">
+              <table id="analyticsEventsTable" class="admin-table">
+                <tbody><tr><td>Analytics reporting requires an event-tracking integration.</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+
+        <!-- 5. PRODUCTS -->
+        <section id="productsSection" class="admin-section" hidden>
+
+          <div class="section-heading section-heading-row">
+            <div>
+              <h2>Manage products</h2>
+              <span>Create, update and organise your product catalogue.</span>
+            </div>
+            <button type="button" id="addProductButton" class="primary-button">+ Add product</button>
+          </div>
+
+          <section id="productFormContainer" class="admin-panel" hidden>
+
+            <div class="section-heading">
+              <h2 id="productFormTitle">Add new product</h2>
+              <button type="button" id="cancelProductForm" class="secondary-button">Close</button>
+            </div>
+
+            <form id="adminProductForm" class="admin-form-grid">
+
+              <input type="hidden" id="editProductId">
+
+              <div>
+                <label for="adminProductName">Product name *</label>
+                <input id="adminProductName" type="text" maxlength="140" required>
+              </div>
+
+              <div>
+                <label for="adminProductCategory">Category *</label>
+                <select id="adminProductCategory" required>
+                  <option value="">Choose category</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="adminProductPrice">Price in ZMW *</label>
+                <input id="adminProductPrice" type="number" min="0.01" step="0.01" required>
+              </div>
+
+              <div>
+                <label for="adminProductPriceZAR">Price in ZAR</label>
+                <input id="adminProductPriceZAR" type="number" min="0.01" step="0.01">
+              </div>
+
+              <div>
+                <label for="adminProductStock">Stock quantity *</label>
+                <input id="adminProductStock" type="number" min="0" step="1" value="0" required>
+              </div>
+
+              <div>
+                <label for="adminProductStatus">Listing status</label>
+                <select id="adminProductStatus">
+                  <option value="active">Active</option>
+                  <option value="draft">Draft</option>
+                  <option value="out_of_stock">Out of stock</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="adminProductSizes">Available sizes</label>
+                <input id="adminProductSizes" type="text" placeholder="S, M, L, 38, 39">
+              </div>
+
+              <div>
+                <label for="adminProductColours">Available colours</label>
+                <input id="adminProductColours" type="text" placeholder="Black, White, Blue">
+              </div>
+
+              <div>
+                <label for="adminProductFeatured">Featured product</label>
+                <select id="adminProductFeatured">
+                  <option value="false">No</option>
+                  <option value="true">Yes</option>
+                </select>
+              </div>
+
+              <!-- PRODUCT IMAGE UPLOAD -->
+              <div class="form-span-two">
+                <label for="adminProductImages">Product pictures *</label>
+
+                <p class="muted">
+                  Select multiple pictures from your phone gallery.
+                  JPEG, PNG and WEBP images are supported.
+                </p>
+
+                <input
+                  id="adminProductImages"
+                  name="productImages"
+                  type="file"
+                  accept="image/*,.jpg,.jpeg,.png,.webp"
+                  multiple
+                >
+
+                <!-- IMPORTANT: JavaScript uses this container to display previews -->
+                <div
+                  id="productImagePreview"
+                  class="image-preview-grid"
+                  aria-live="polite"
+                ></div>
+
+                <p
+                  id="imageUploadMessage"
+                  class="form-message"
+                  role="status"
+                  aria-live="polite"
+                ></p>
+              </div>
+
+              <div class="form-span-two">
+                <label for="adminProductDescription">Product description</label>
+                <textarea id="adminProductDescription" rows="4"
+                  placeholder="Describe this product..."></textarea>
+              </div>
+
+              <div class="form-span-two form-actions">
+                <button type="submit" class="primary-button">Save product</button>
+                <p id="productMessage" class="form-message"
+                  role="status" aria-live="polite"></p>
+              </div>
+
+            </form>
+          </section>
+
+          <section class="admin-panel">
+            <div id="adminProductsList">
+              <p class="empty-message">Loading products...</p>
+            </div>
+          </section>
+        </section>
+
+
+        <!-- 6. CATEGORIES -->
+        <section id="categoriesSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Category management</h2>
+            <span>Manage product categories.</span>
+          </div>
+
+          <section class="admin-panel">
+            <h3 id="categoryFormHeading">Add category</h3>
+            <form id="adminCategoryForm" class="admin-form-grid">
+              <input type="hidden" id="editCategoryId">
+
+              <div>
+                <label for="categoryName">Category name *</label>
+                <input id="categoryName" required>
+              </div>
+
+              <div>
+                <label for="categoryStatus">Status</label>
+                <select id="categoryStatus">
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div class="form-span-two">
+                <label for="categoryDescription">Description</label>
+                <textarea id="categoryDescription" rows="2"></textarea>
+              </div>
+
+              <div class="form-span-two">
+                <button type="submit" class="primary-button">Save category</button>
+                <p id="categoryMessage" class="form-message"></p>
+              </div>
+            </form>
+          </section>
+
+          <section class="admin-panel"><div id="adminCategoriesList"></div></section>
+        </section>
+
+
+        <!-- 7. INVENTORY -->
+        <section id="inventorySection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Inventory</h2>
+            <span>Monitor stock quantities.</span>
+          </div>
+          <section class="admin-panel"><div id="adminInventoryList"></div></section>
+        </section>
+
+
+        <!-- 8. ORDERS -->
+        <section id="ordersSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Manage orders</h2>
+            <span>Search orders and update processing status.</span>
+          </div>
+
+          <section class="admin-panel">
+            <div class="filter-row">
+              <input id="orderSearch" type="search" placeholder="Search order, customer, phone or item">
+
+              <select id="orderStatusFilter">
+                <option value="">All order statuses</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+
+              <select id="orderPaymentFilter">
+                <option value="">All payment statuses</option>
+                <option value="unpaid">Unpaid</option>
+                <option value="pending">Pending</option>
+                <option value="paid">Paid</option>
+                <option value="failed">Failed</option>
+              </select>
+
+              <button type="button" id="searchOrdersButton" class="secondary-button">Search</button>
+            </div>
+
+            <div id="adminOrdersList"></div>
+          </section>
+
+          <section class="admin-panel">
+            <h3>Update selected order</h3>
+            <form id="adminOrderForm" class="admin-form-grid">
+              <div>
+                <label for="manageOrderNumber">Order reference</label>
+                <input id="manageOrderNumber" required>
+              </div>
+
+              <div>
+                <label for="manageOrderStatus">Order status</label>
+                <select id="manageOrderStatus">
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              <div class="form-span-two">
+                <label for="orderAdminNotes">Administrator notes</label>
+                <textarea id="orderAdminNotes" rows="3"></textarea>
+              </div>
+
+              <div class="form-span-two">
+                <button type="submit" class="primary-button">Update order</button>
+                <p id="orderMessage" class="form-message"></p>
+              </div>
+            </form>
+          </section>
+        </section>
+
+
+        <!-- 9. PAYMENTS -->
+        <section id="paymentsSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Payments</h2>
+            <span>Record and review payment information.</span>
+          </div>
+
+          <section class="admin-panel">
+            <h3>Add payment record</h3>
+            <form id="adminPaymentForm" class="admin-form-grid">
+              <div>
+                <label for="paymentOrderNumber">Order reference *</label>
+                <input id="paymentOrderNumber" required>
+              </div>
+
+              <div>
+                <label for="paymentMethod">Payment method *</label>
+                <select id="paymentMethod" required>
+                  <option value="">Choose method</option>
+                  <option>MTN Mobile Money</option>
+                  <option>Airtel Money</option>
+                  <option>Bank Transfer</option>
+                  <option>Cash</option>
+                  <option>Card</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="paymentAmount">Amount *</label>
+                <input id="paymentAmount" type="number" min="0.01" step="0.01" required>
+              </div>
+
+              <div>
+                <label for="paymentCurrency">Currency *</label>
+                <select id="paymentCurrency">
+                  <option value="ZMW">ZMW</option>
+                  <option value="ZAR">ZAR</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="paymentReference">Transaction reference</label>
+                <input id="paymentReference">
+              </div>
+
+              <div>
+                <label for="paymentDate">Payment date</label>
+                <input id="paymentDate" type="date">
+              </div>
+
+              <div>
+                <label for="paymentStatus">Record status *</label>
+                <select id="paymentStatus">
+                  <option value="pending">Pending</option>
+                  <option value="paid">Paid - manual confirmation</option>
+                  <option value="failed">Failed</option>
+                </select>
+              </div>
+
+              <div class="form-span-two">
+                <label for="paymentNotes">Notes</label>
+                <textarea id="paymentNotes" rows="2"></textarea>
+              </div>
+
+              <div class="form-span-two">
+                <button type="submit" class="primary-button">Save payment record</button>
+                <p id="paymentMessage" class="form-message"></p>
+              </div>
+            </form>
+          </section>
+
+          <section class="admin-panel"><div id="adminPaymentsList"></div></section>
+        </section>
+
+
+        <!-- 10. DISCOUNTS -->
+        <section id="discountsSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Discounts</h2>
+            <span>Manage promotional campaigns.</span>
+          </div>
+          <section class="admin-panel">
+            <p>Discount creation and checkout validation require their own database and storefront integration.</p>
+          </section>
+        </section>
+
+
+        <!-- 11. CUSTOMERS -->
+        <section id="customersSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Customers</h2>
+            <span>Customer information and records.</span>
+          </div>
+
+          <section class="admin-panel">
+            <h3>Add or update customer</h3>
+            <form id="adminCustomerForm" class="admin-form-grid">
+              <div>
+                <label for="customerFullName">Full name *</label>
+                <input id="customerFullName" required>
+              </div>
+
+              <div>
+                <label for="customerEmail">Email</label>
+                <input id="customerEmail" type="email">
+              </div>
+
+              <div>
+                <label for="customerPhone">Phone</label>
+                <input id="customerPhone">
+              </div>
+
+              <div>
+                <label for="customerCountry">Country</label>
+                <input id="customerCountry">
+              </div>
+
+              <div class="form-span-two">
+                <label for="customerAddress">Address</label>
+                <textarea id="customerAddress" rows="2"></textarea>
+              </div>
+
+              <div class="form-span-two">
+                <button type="submit" class="primary-button">Save customer</button>
+                <p id="customerMessage" class="form-message"></p>
+              </div>
+            </form>
+          </section>
+
+          <section class="admin-panel">
+            <div class="filter-row">
+              <input id="customerSearch" type="search" placeholder="Search customers">
+              <button id="searchCustomersButton" type="button" class="secondary-button">Search</button>
+            </div>
+            <div id="adminCustomersList"></div>
+          </section>
+        </section>
+
+
+        <!-- 12. REVIEWS -->
+        <section id="reviewsSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Customer reviews</h2>
+            <span>Review moderation.</span>
+          </div>
+          <section class="admin-panel">
+            <div id="adminReviewsList">
+              <p class="empty-message">Review records will appear here when connected.</p>
+            </div>
+          </section>
+        </section>
+
+
+        <!-- 13. ANNOUNCEMENTS -->
+        <section id="announcementsSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Announcements</h2>
+            <span>Manage store announcements.</span>
+          </div>
+
+          <section class="admin-panel">
+            <form id="adminAnnouncementForm" class="admin-form-grid">
+              <div class="form-span-two">
+                <label for="announcementTitle">Announcement title</label>
+                <input id="announcementTitle">
+              </div>
+
+              <div class="form-span-two">
+                <label for="announcementMessage">Announcement message</label>
+                <textarea id="announcementMessage" rows="4"></textarea>
+              </div>
+
+              <div>
+                <label for="announcementStatus">Publication status</label>
+                <select id="announcementStatus">
+                  <option value="false">Draft</option>
+                  <option value="true">Published</option>
+                </select>
+              </div>
+
+              <div class="form-span-two">
+                <button type="submit" class="primary-button">Save announcement</button>
+                <p id="announcementMessageStatus" class="form-message"></p>
+              </div>
+            </form>
+
+            <div id="adminAnnouncementsList"></div>
+          </section>
+        </section>
+
+
+        <!-- 14. STOREFRONT -->
+        <section id="storefrontSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Storefront settings</h2>
+            <span>Manage store presentation and contact details.</span>
+          </div>
+
+          <section class="admin-panel">
+            <form id="adminStorefrontForm" class="admin-form-grid">
+              <div>
+                <label for="storeHeroTitle">Hero title</label>
+                <input id="storeHeroTitle">
+              </div>
+
+              <div>
+                <label for="storeHeroImage">Hero image URL</label>
+                <input id="storeHeroImage" type="url">
+              </div>
+
+              <div class="form-span-two">
+                <label for="storeHeroSubtitle">Hero subtitle</label>
+                <textarea id="storeHeroSubtitle" rows="2"></textarea>
+              </div>
+
+              <div class="form-span-two">
+                <label for="storeAnnouncement">Announcement</label>
+                <textarea id="storeAnnouncement" rows="2"></textarea>
+              </div>
+
+              <div>
+                <label for="storeContactEmail">Contact email</label>
+                <input id="storeContactEmail" type="email">
+              </div>
+
+              <div>
+                <label for="storeContactPhone">Contact phone</label>
+                <input id="storeContactPhone">
+              </div>
+
+              <div class="form-span-two">
+                <button type="submit" class="primary-button">Save storefront settings</button>
+                <p id="storefrontMessage" class="form-message"></p>
+              </div>
+            </form>
+          </section>
+        </section>
+
+
+        <!-- 15. GENERAL SETTINGS -->
+        <section id="settingsSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>General settings</h2>
+            <span>Store preferences and administrator account.</span>
+          </div>
+
+          <section class="admin-panel">
+            <form id="adminSettingsForm" class="admin-form-grid">
+              <div>
+                <label for="settingsStoreName">Store name</label>
+                <input id="settingsStoreName" value="SINKZCLOSETS">
+              </div>
+
+              <div>
+                <label for="settingsDefaultCurrency">Default currency</label>
+                <select id="settingsDefaultCurrency">
+                  <option value="ZMW">ZMW</option>
+                  <option value="ZAR">ZAR</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="settingsTimezone">Timezone</label>
+                <input id="settingsTimezone" value="Africa/Lusaka">
+              </div>
+
+              <div>
+                <label for="settingsSupportEmail">Support email</label>
+                <input id="settingsSupportEmail" type="email"
+                  value="lungumordenconstruction.info@gmail.com">
+              </div>
+
+              <div class="form-span-two">
+                <label for="settingsStoreDescription">Store description</label>
+                <textarea id="settingsStoreDescription" rows="3"></textarea>
+              </div>
+
+              <div class="form-span-two">
+                <button type="submit" class="primary-button">Save settings</button>
+                <p id="settingsMessage" class="form-message"></p>
+              </div>
+            </form>
+          </section>
+
+          <section class="admin-panel">
+            <h3>Administrator account</h3>
+            <p class="muted">
+              Change the administrator login email through Supabase's authenticated email-change process. Email confirmation may be required.
+            </p>
+
+            <p>Current administrator: <strong id="currentAdminEmail">Not signed in</strong></p>
+
+            <button type="button" id="changeAdminEmailButton" class="secondary-button">
+              Request administrator email change
+            </button>
+
+            <p id="adminAccountMessage" class="form-message"
+              role="status" aria-live="polite"></p>
+          </section>
+        </section>
+
+      </div>
+
+      <footer class="admin-footer">SINKZCLOSETS Admin Dashboard</footer>
+
+    </main>
+  </div>
+
+</body>
+</html>
