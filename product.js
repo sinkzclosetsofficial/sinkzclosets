@@ -37,6 +37,22 @@
             ? window.SinkzStore.getProduct(productId)
             : null;
 
+        if (!product) {
+
+        window.addEventListener("sinkz:products-updated", function (event) {
+            if (
+                event.detail &&
+                event.detail.source === "supabase" &&
+                window.SinkzStore &&
+                window.SinkzStore.getProduct(productId) &&
+                !productDetails?.dataset.catalogueLoaded
+            ) {
+                window.location.reload();
+            }
+        }, { once: true });
+
+        }
+
         // -------------------------------------------------
         // 4. HANDLE MISSING PRODUCT
         // -------------------------------------------------
@@ -57,6 +73,10 @@
         // -------------------------------------------------
         // 5. DISPLAY PRODUCT INFORMATION
         // -------------------------------------------------
+
+        if (productDetails) {
+            productDetails.dataset.catalogueLoaded = "true";
+        }
 
         productName.textContent = product.name;
         productCategory.textContent = product.category;
