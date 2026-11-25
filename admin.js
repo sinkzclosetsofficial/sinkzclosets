@@ -202,6 +202,105 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentProductImages = [];
   let selectedImageFiles = [];
 
+  // Register image selection handling early in dashboard startup.
+  // Delegation at document level also catches Android gallery input events
+  // even if the product form is re-rendered later.
+  function handleProductImageSelection(event) {
+    const input = event.target;
+
+    if (!input || input.id !== "adminProductImages") return;
+
+    const files = Array.from(input.files || []);
+
+    if (!files.length) return;
+
+    let added = 0;
+    const rejected = [];
+
+    for (const file of files) {
+      const contentType = getSupportedImageType(file);
+      const extension = getImageExtension(file, contentType);
+
+      if (!contentType || !extension) {
+        rejected.push(
+          `${file.name || "Selected file"}: unsupported format. Use JPG, JPEG, PNG or WEBP.`
+        );
+        continue;
+      }
+
+      if (!file.size) {
+        rejected.push(`${file.name}: file is empty.`);
+        continue;
+      }
+
+      if (file.size > MAX_IMAGE_SIZE) {
+        rejected.push(`${file.name}: larger than 10 MB.`);
+        continue;
+      }
+
+      const duplicate = selectedImageFiles.some(item =>
+        item.file.name === file.name &&
+        item.file.size === file.size &&
+        item.file.lastModified === file.lastModified
+      );
+
+      if (duplicate) continue;
+
+      let previewURL;
+
+      try {
+        previewURL = URL.createObjectURL(file);
+      } catch (error) {
+        console.error("Could not create product image preview:", error);
+        rejected.push(`${file.name}: browser could not create a preview.`);
+        continue;
+      }
+
+      selectedImageFiles.push({
+        file,
+        contentType,
+        extension,
+        preview: previewURL
+      });
+
+      added++;
+    }
+
+    // Always refresh the preview after processing the picker selection.
+    renderImagePreviews();
+
+    if (added > 0) {
+      showMessage(
+        "imageUploadMessage",
+        `${added} image(s) selected. Preview them below, then save the product to upload.`,
+        "success"
+      );
+    } else if (rejected.length) {
+      showMessage(
+        "imageUploadMessage",
+        "No new images were accepted. " + rejected.join(" "),
+        "error"
+      );
+    } else {
+      showMessage(
+        "imageUploadMessage",
+        "Those images are already selected.",
+        "info"
+      );
+    }
+
+    // File objects are retained in selectedImageFiles; clearing the native
+    // picker permits selecting the same file again without losing previews.
+    input.value = "";
+  }
+
+  document.addEventListener(
+    "change",
+    handleProductImageSelection,
+    true
+  );
+
+
   let isSavingProduct = false;
   let dashboardLoadInProgress = false;
 
@@ -941,107 +1040,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return IMAGE_EXTENSION_BY_TYPE[contentType] || null;
   }
 
-  $("adminProductImages")?.addEventListener("change", event => {
 
-    const input = event.currentTarget;
-    const files = Array.from(input.files || []);
-
-    if (!files.length) return;
-
-    let added = 0;
-    const rejected = [];
-
-    for (const file of files) {
-
-      const contentType = getSupportedImageType(file);
-      const extension = getImageExtension(file, contentType);
-
-      if (!contentType || !extension) {
-        rejected.push(
-          `${file.name}: unsupported format. Use JPG, JPEG, PNG or WEBP.`
-        );
-
-        continue;
-      }
-
-      if (file.size <= 0) {
-        rejected.push(`${file.name}: file is empty.`);
-        continue;
-      }
-
-      if (file.size > MAX_IMAGE_SIZE) {
-        rejected.push(`${file.name}: larger than 10 MB.`);
-        continue;
-      }
-
-      const duplicate = selectedImageFiles.some(item =>
-        item.file.name === file.name &&
-        item.file.size === file.size &&
-        item.file.lastModified === file.lastModified
-      );
-
-      if (duplicate) continue;
-
-      let preview;
-
-      try {
-        preview = URL.createObjectURL(file);
-      } catch (error) {
-        console.error("Image preview creation error:", error);
-
-        rejected.push(
-          `${file.name}: your browser could not create a preview.`
-        );
-
-        continue;
-      }
-
-      selectedImageFiles.push({
-        file,
-        contentType,
-        extension,
-        preview
-      });
-
-      added++;
-    }
-
-    renderImagePreviews();
-
-    if (added > 0) {
-      showMessage(
-        "imageUploadMessage",
-        `${added} image(s) selected. They will upload when you save the product.`,
-        "success"
-      );
-    } else if (rejected.length) {
-      showMessage(
-        "imageUploadMessage",
-        "No new images were accepted.",
-        "error"
-      );
-    } else {
-      showMessage(
-        "imageUploadMessage",
-        "Those images are already selected.",
-        "info"
-      );
-    }
-
-    if (rejected.length) {
-      console.warn("Image selection warnings:", rejected);
-
-      showMessage(
-        "imageUploadMessage",
-        `${added} accepted. ${rejected.join(" ")}`,
-        added > 0 ? "info" : "error"
-      );
-    }
-
-    // Clear the picker but retain the selected File objects.
-    // This allows the user to select the same file again later.
-    input.value = "";
-  });
 
 
   /* =======================================================
