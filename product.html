@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171717">
+  <meta name="description" content="View product details and add your selection to the SINKZCLOSETS shopping cart.">
+  <title>Product | SINKZCLOSETS</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="store.js"></script>
+  <script defer src="product.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">SINKZ<span>CLOSETS</span></a>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+    <nav id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="about.html">About & Contact</a>
+      <a href="cart.html">Cart <b id="cartCount">0</b></a>
+    </nav>
+  </header>
+
+  <main class="page-main">
+    <section class="section">
+      <p class="eyebrow">SINKZCLOSETS COLLECTION</p>
+      <p><a href="shop.html">← Back to shop</a></p>
+
+      <section id="productDetails" class="product-detail">
+        <div id="productImage" class="detail-image" aria-label="Product image">
+          Product image loading...
+        </div>
+
+        <div class="detail-copy">
+          <p id="productCategory" class="eyebrow"></p>
+          <h1 id="productName">Loading product...</h1>
+          <p id="productPrice" class="price"></p>
+          <p id="productDescription" class="muted"></p>
+
+          <label for="productQuantity">Quantity</label>
+          <input id="productQuantity" type="number" min="1" step="1" value="1" inputmode="numeric">
+
+          <button id="addProductToCart" class="btn" type="button">Add to cart</button>
+          <p class="muted">Your item will be added to your shopping cart. Availability and order details are confirmed during checkout.</p>
+        </div>
+      </section>
+
+      <section id="productNotFound" class="content-card" hidden>
+        <h1>Product not found</h1>
+        <p class="muted">This product may no longer be available, or the link may be incorrect.</p>
+        <a class="btn" href="shop.html">Return to shop</a>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="currentYear"></span> SINKZCLOSETS. All rights reserved.</p>
+    <nav aria-label="Footer navigation">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms & Conditions</a>
+    </nav>
+  </footer>
+
+  <script>
+    const year = document.getElementById("currentYear");
+    if (year) year.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
