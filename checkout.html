@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171717">
+  <meta name="description" content="Review your SINKZCLOSETS order and submit your order enquiry.">
+  <title>Checkout | SINKZCLOSETS</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/store.js"></script>
+  <script defer src="js/checkout.js"></script>
+
+  <style>
+    .checkout-layout {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .checkout-card {
+      background: var(--paper, #fff);
+      border: 1px solid var(--line, #e7e2dc);
+      border-radius: 10px;
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .checkout-card h2 { margin-top: 0; }
+
+    .checkout-field { margin-bottom: 16px; }
+
+    .checkout-field label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 600;
+    }
+
+    .checkout-field input,
+    .checkout-field textarea,
+    .checkout-field select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid var(--line, #ddd);
+      border-radius: 6px;
+      font: inherit;
+      background: var(--paper, #fff);
+      color: var(--ink, #171717);
+    }
+
+    .checkout-field textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .checkout-notice,
+    .checkout-warning {
+      padding: 14px;
+      border-radius: 7px;
+      margin: 16px 0;
+      line-height: 1.6;
+    }
+
+    .checkout-notice {
+      background: var(--soft, #f5f3f0);
+    }
+
+    .checkout-warning {
+      background: #fff5e5;
+      border: 1px solid #e8bd75;
+      color: #53370e;
+    }
+
+    .checkout-warning[hidden] { display: none; }
+
+    .checkout-line,
+    .checkout-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line, #e7e2dc);
+    }
+
+    .checkout-total {
+      border: 0;
+      padding-top: 18px;
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    .payment-options {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .payment-option,
+    .subtype-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid var(--line, #ddd);
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    .payment-option:has(input:checked),
+    .subtype-option:has(input:checked) {
+      border-color: var(--accent, #b88a52);
+      background: var(--soft, #f5f3f0);
+    }
+
+    .payment-option input,
+    .subtype-option input {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .payment-option strong,
+    .payment-option small {
+      display: block;
+    }
+
+    .payment-option small {
+      color: var(--muted, #777);
+      margin-top: 3px;
+    }
+
+    .payment-details,
+    .capitec-subtypes {
+      display: none;
+      padding: 15px;
+      margin: 12px 0 20px;
+      background: var(--soft, #f5f3f0);
+      border: 1px solid var(--line, #ddd);
+      border-radius: 8px;
+    }
+
+    .payment-details.active,
+    .capitec-subtypes.active {
+      display: block;
+    }
+
+    .payment-detail-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+
+    .payment-detail-line strong { overflow-wrap: anywhere; }
+
+    .copy-button,
+    .app-link {
+      display: inline-block;
+      padding: 8px 12px;
+      border: 1px solid var(--line, #ddd);
+      border-radius: 5px;
+      background: var(--paper, #fff);
+      color: var(--ink, #171717);
+      font: inherit;
+      font-size: .88rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .app-link {
+      margin: 8px 8px 4px 0;
+      background: var(--ink, #171717);
+      color: #fff;
+      border-color: var(--ink, #171717);
+    }
+
+    .payment-help {
+      color: var(--muted, #777);
+      font-size: .9rem;
+      line-height: 1.6;
+    }
+
+    .checkout-submit {
+      width: 100%;
+      padding: 14px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--accent, #b88a52);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .checkout-submit:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .checkout-empty {
+      padding: 20px;
+      border: 1px solid var(--line, #ddd);
+      border-radius: 8px;
+    }
+
+    @media (max-width: 750px) {
+      .checkout-layout { grid-template-columns: 1fr; }
+      .checkout-card { padding: 17px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">SINKZ<span>CLOSETS</span></a>
+    <button class="menu-toggle" id="menuToggle"
+      type="button" aria-label="Open menu">☰</button>
+
+    <nav id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="about.html">About &amp; Contact</a>
+      <a class="active" href="cart.html">Cart <b id="cartCount">0</b></a>
+    </nav>
+  </header>
+
+  <main class="page-main">
+    <section class="section">
+      <p class="eyebrow">FINAL STEP</p>
+      <h1>Checkout</h1>
+      <p class="muted">Review your order and provide your delivery details.</p>
+
+      <div class="checkout-notice">
+        <strong>Payment safety:</strong>
+        Confirm the recipient's name, payment number or bank account,
+        and amount before paying. Never share your PIN or password.
+        Payments made through these services are not automatically verified.
+      </div>
+
+      <div id="checkoutWarning" class="checkout-warning"
+        role="alert" hidden></div>
+
+      <div id="checkoutEmpty" class="checkout-empty" hidden>
+        <h2>Your cart is empty.</h2>
+        <p>Add products before proceeding to checkout.</p>
+        <a href="shop.html" class="btn">Continue shopping</a>
+      </div>
+
+      <div class="checkout-layout" id="checkoutContent">
+        <section class="checkout-card">
+          <h2>Customer information</h2>
+
+          <form id="checkoutForm">
+            <div class="checkout-field">
+              <label for="customerName">Full name</label>
+              <input id="customerName" name="customerName"
+                type="text" autocomplete="name" required maxlength="120">
+            </div>
+
+            <div class="checkout-field">
+              <label for="customerPhone">Phone number</label>
+              <input id="customerPhone" name="customerPhone"
+                type="tel" autocomplete="tel" required maxlength="30">
+            </div>
+
+            <div class="checkout-field">
+              <label for="customerEmail">Email address (optional)</label>
+              <input id="customerEmail" name="customerEmail"
+                type="email" autocomplete="email" maxlength="160">
+            </div>
+
+            <div class="checkout-field">
+              <label for="customerAddress">Delivery address</label>
+              <textarea id="customerAddress" name="customerAddress"
+                autocomplete="street-address" required maxlength="500"></textarea>
+            </div>
+
+            <div class="checkout-field">
+              <label for="customerNotes">Additional notes (optional)</label>
+              <textarea id="customerNotes" name="customerNotes"
+                maxlength="1000"></textarea>
+            </div>
+
+            <h2>Payment method</h2>
+
+            <div class="payment-options">
+              <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="mtn" required>
+                <span>
+                  <strong>MTN MoMo</strong>
+                  <small>Mobile money payment</small>
+                </span>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="airtel">
+                <span>
+                  <strong>Airtel Money</strong>
+                  <small>Mobile money payment</small>
+                </span>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="capitec">
+                <span>
+                  <strong>Capitec</strong>
+                  <small>Bank transfer or Cash Send</small>
+                </span>
+              </label>
+            </div>
+
+            <div id="capitecSubtypes" class="capitec-subtypes">
+              <h3>Select Capitec payment type</h3>
+
+              <label class="subtype-option">
+                <input type="radio" name="capitecType" value="bank_transfer">
+                <span>Capitec Bank Transfer</span>
+              </label>
+
+              <label class="subtype-option">
+                <input type="radio" name="capitecType" value="cash_send">
+                <span>Capitec Cash Send</span>
+              </label>
+            </div>
+
+            <div id="paymentDetails" class="payment-details" aria-live="polite">
+              <h3 id="paymentTitle"></h3>
+              <div id="paymentInformation"></div>
+            </div>
+
+            <div class="checkout-field">
+              <label for="paymentReference">
+                Payment reference (optional)
+              </label>
+              <input id="paymentReference" name="paymentReference"
+                type="text" maxlength="100"
+                placeholder="Enter reference if you have already paid">
+            </div>
+
+            <button id="checkoutSubmit" class="checkout-submit" type="submit">
+              Continue to WhatsApp
+            </button>
+
+            <p class="payment-help">
+              This sends an order enquiry to SINKZCLOSETS through WhatsApp.
+              It does not itself confirm an order or verify payment.
+            </p>
+          </form>
+        </section>
+
+        <aside class="checkout-card">
+          <h2>Your order</h2>
+          <p id="checkoutCurrency" class="muted"></p>
+          <div id="checkoutItems"></div>
+
+          <div class="checkout-total">
+            <span>Total</span>
+            <span id="checkoutTotal">—</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand" href="index.html">SINKZ<span>CLOSETS</span></a>
+    <p>Fashion for your everyday moments.</p>
+    <div>
+      <a href="about.html">About &amp; Contact</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="admin.html">Admin</a>
+    </div>
+    <small>© <span id="footerYear"></span> SINKZCLOSETS. All rights reserved.</small>
+  </footer>
+</body>
+</html>
