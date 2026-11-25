@@ -1231,7 +1231,12 @@
         image.className = "product-image";
         image.alt = product.name || "Product";
 
+        const productImages = Array.isArray(product.images)
+            ? product.images
+            : [];
+
         image.src = product.image ||
+            productImages[0] ||
             "https://placehold.co/600x700?text=SINKZCLOSETS";
 
         image.onerror = function () {
@@ -1499,9 +1504,44 @@
             if (error) throw error;
 
             const liveProducts = (data || []).map(function (product) {
-                const images = Array.isArray(product.images)
-                    ? product.images
-                    : [];
+                let images = [];
+
+                if (Array.isArray(product.images)) {
+                    images = product.images;
+                } else if (
+                    typeof product.images === "string" &&
+                    product.images.trim()
+                ) {
+                    try {
+                        const parsed = JSON.parse(product.images);
+                        images = Array.isArray(parsed)
+                            ? parsed
+                            : [product.images];
+                    } catch {
+                        images = [product.images];
+                    }
+                }
+
+                images = images
+                    .filter(function (url) {
+                        return typeof url === "string" && url.trim();
+                    })
+                    .map(function (url) {
+                        return url.trim();
+                    });
+
+                const primaryImage =
+                    typeof product.image === "string" &&
+                    product.image.trim()
+                        ? product.image.trim()
+                        : (images[0] || "");
+
+                if (
+                    primaryImage &&
+                    !images.includes(primaryImage)
+                ) {
+                    images.unshift(primaryImage);
+                }
 
                 return Object.assign({}, product, {
                     price_zmw:
@@ -1509,7 +1549,7 @@
                         product.price_zmw !== null
                             ? product.price_zmw
                             : product.price,
-                    image: product.image || images[0] || "",
+                    image: primaryImage,
                     images: images
                 });
             });
