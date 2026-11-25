@@ -2056,7 +2056,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .trim()
       .toLowerCase();
 
-    if (!requestedEmail || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(requestedEmail)) {
+    if (!requestedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(requestedEmail)) {
       showMessage("adminAccountMessage", "Enter a valid new email address.", "error");
       return;
     }
