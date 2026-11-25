@@ -539,9 +539,16 @@
 
 
         /* =================================================
-           BLACK + CREAM EDITORIAL HOMEPAGE REDESIGN
-           Scoped to .sinkz-home; preserves page behaviour.
+           BLACK + CREAM HOMEPAGE — SELF-CONTAINED LAYOUT
+           Uses the actual homepage classes in this document.
+           Header/navigation remain styled if style.css fails.
         ================================================= */
+        body {
+            margin: 0;
+            background: #f7f3eb;
+            color: #111;
+            font-family: "DM Sans", Arial, sans-serif;
+        }
         .sinkz-home {
             --ink: #111111;
             --muted: #69645d;
@@ -550,296 +557,340 @@
             --accent: #b9975b;
             --royal: #111111;
             --line: #ded5c7;
+            width: 100%;
+            min-height: 100vh;
+            overflow: hidden;
             background: var(--paper);
             color: var(--ink);
         }
+        .sinkz-home a { color: inherit; }
         .sinkz-home .sinkz-announcement {
+            padding: 10px 16px;
             background: #111;
             color: #f7f3eb;
-            padding: 11px 16px;
-            letter-spacing: 1.8px;
+            text-align: center;
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            line-height: 1.5;
         }
-        .sinkz-home .sinkz-announcement strong,
-        .sinkz-home .eyebrow,
-        .sinkz-home .sinkz-category-number {
-            color: var(--accent);
-        }
+        .sinkz-home .sinkz-announcement strong { color: #c5a46a; }
         .sinkz-home .site-header {
-            background: rgba(247,243,235,.97);
-            border-bottom: 1px solid var(--line);
-            box-shadow: 0 5px 24px rgba(17,17,17,.045);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            min-height: 72px;
+            padding: 0 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 22px;
+            background: rgba(247,243,235,.98);
+            border-bottom: 1px solid #ded5c7;
+            box-shadow: 0 5px 22px rgba(17,17,17,.045);
         }
-        .sinkz-home .brand { color: #111; letter-spacing: 2.5px; }
-        .sinkz-home .brand span { color: var(--accent); }
-        .sinkz-home #mainNav a { color: #24211d; }
-        .sinkz-home #mainNav a.active,
-        .sinkz-home #mainNav a:hover { color: #a9874e; }
-        .sinkz-home #mainNav b {
+        .sinkz-home .site-header .brand {
+            display: inline-block;
+            flex: 0 0 auto;
+            color: #111;
+            font-family: "DM Sans",Arial,sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            line-height: 1.2;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .sinkz-home .site-header .brand span { color: #b9975b; }
+        .sinkz-home .site-header nav#mainNav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(12px,2vw,26px);
+            margin-left: auto;
+        }
+        .sinkz-home .site-header nav#mainNav a {
+            display: inline-block;
+            padding: 10px 0;
+            color: #24211d;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.3;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .sinkz-home .site-header nav#mainNav a:hover,
+        .sinkz-home .site-header nav#mainNav a.active { color: #987744; }
+        .sinkz-home .site-header nav#mainNav b {
+            display: inline-block;
+            min-width: 20px;
+            padding: 2px 7px;
+            border-radius: 20px;
             background: #111;
             color: #f7f3eb;
+            text-align: center;
+            font-size: 11px;
         }
-        .sinkz-home .menu-toggle { color: #111; }
-        .sinkz-home .sinkz-header-tools .cart-button {
-            border-color: #b9975b;
-            color: #111;
+        .sinkz-home .menu-toggle {
+            display: none;
+            flex: 0 0 auto;
+            padding: 8px 10px;
+            border: 1px solid #c9b895;
+            border-radius: 2px;
             background: transparent;
-        }
-        .sinkz-home .sinkz-header-tools .cart-button b { color: #a9874e; }
-        .sinkz-home .sinkz-home-hero {
-            background: linear-gradient(112deg,#f7f3eb 0%,#f7f3eb 54%,#eae2d4 54%,#eae2d4 100%);
-            gap: clamp(24px,4vw,58px);
-            padding-top: clamp(48px,7vw,88px);
-            padding-bottom: clamp(48px,7vw,88px);
-        }
-        .sinkz-home .hero-copy h1 {
             color: #111;
-            font-size: clamp(42px,5.4vw,72px);
-            letter-spacing: -1.7px;
+            font-size: 23px;
+            line-height: 1;
         }
-        .sinkz-home .hero-copy h1 span { color: #a9874e; }
-        .sinkz-home .hero-copy > p:not(.eyebrow) {
+        .sinkz-home .sinkz-header-tools {
+            display: flex;
+            align-items: center;
+            flex: 0 0 auto;
+            gap: 10px;
+        }
+        .sinkz-home .sinkz-header-tools .cart-button {
+            padding: 10px 14px;
+            border: 1px solid #b9975b;
+            border-radius: 2px;
+            background: transparent;
+            color: #111;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .sinkz-home .sinkz-header-tools .cart-button b { color: #987744; }
+        .sinkz-home .eyebrow,
+        .sinkz-home .sinkz-category-number { color: #a9874e; }
+        .sinkz-home .sinkz-home-hero {
+            display: grid;
+            grid-template-columns: minmax(0,1fr) minmax(0,.95fr);
+            align-items: center;
+            gap: clamp(24px,4vw,58px);
+            padding: clamp(48px,7vw,88px) 7%;
+            background: linear-gradient(112deg,#f7f3eb 0%,#f7f3eb 54%,#eae2d4 54%,#eae2d4 100%);
+        }
+        .sinkz-home .sinkz-home-hero .hero-copy { max-width: 620px; }
+        .sinkz-home .sinkz-home-hero .hero-copy h1 {
+            color: #111;
+            font-family: "Playfair Display",Georgia,serif;
+            font-size: clamp(40px,5.4vw,72px);
+            line-height: 1.08;
+            letter-spacing: -1.5px;
+        }
+        .sinkz-home .sinkz-home-hero .hero-copy h1 span { color: #a9874e; }
+        .sinkz-home .sinkz-home-hero .hero-copy > p:not(.eyebrow) {
+            max-width: 510px;
             color: #625d55;
             font-size: 15px;
-            line-height: 1.9;
+            line-height: 1.85;
         }
-        .sinkz-home .btn,
-        .sinkz-home .sinkz-search-form button {
-            background: #111;
-            color: #f7f3eb;
+        .sinkz-home .sinkz-hero-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 25px;
+        }
+        .sinkz-home .btn {
+            display: inline-block;
+            padding: 14px 24px;
             border: 1px solid #111;
             border-radius: 2px;
-            box-shadow: none;
+            background: #111;
+            color: #f7f3eb;
+            font-size: 12px;
+            font-weight: 700;
             letter-spacing: 1px;
+            text-decoration: none;
             text-transform: uppercase;
-            transition: background .2s ease,color .2s ease,border-color .2s ease,transform .2s ease;
+            box-shadow: none;
         }
-        .sinkz-home .btn:hover,
-        .sinkz-home .sinkz-search-form button:hover {
-            background: #b9975b;
-            border-color: #b9975b;
-            color: #111;
+        .sinkz-home .btn:hover { background: #b9975b; border-color: #b9975b; color: #111; }
+        .sinkz-home .sinkz-hero-secondary {
+            color: #25211b;
+            font-weight: 700;
+            text-decoration: none;
         }
-        .sinkz-home .sinkz-hero-secondary { color: #25211b; }
-        .sinkz-home .sinkz-hero-secondary:hover { color: #a9874e; }
         .sinkz-home .sinkz-hero-art {
             min-height: clamp(300px,39vw,500px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
             border-radius: 2px;
+            background:
+                linear-gradient(90deg,rgba(15,18,24,.58),rgba(15,18,24,.12)),
+                url("https://images.unsplash.com/photo-1529139574466-a303027c1d8f?auto=format&fit=crop&w=1200&q=85") center 38%/cover no-repeat;
             box-shadow: 0 24px 55px rgba(17,17,17,.17);
-            background-position: center 35%;
         }
         .sinkz-home .sinkz-hero-art::before,
         .sinkz-home .sinkz-hero-art::after { display: none; }
         .sinkz-home .sinkz-hero-art-inner {
+            position: relative;
+            z-index: 1;
             color: #fff;
             font-family: Georgia,serif;
+            font-size: clamp(34px,5vw,60px);
+            font-weight: 700;
             letter-spacing: 7px;
+            text-align: center;
             text-shadow: 0 3px 18px rgba(0,0,0,.45);
         }
         .sinkz-home .sinkz-hero-art-inner span { color: #e4c895; }
-        .sinkz-home .sinkz-search-section {
-            background: #eee8dc;
-            border-top: 1px solid #ded5c7;
-            border-bottom: 1px solid #ded5c7;
-            padding-top: 42px;
-            padding-bottom: 42px;
-        }
-        .sinkz-home .sinkz-search-inner h2,
-        .sinkz-home .sinkz-section-intro h2,
-        .sinkz-home .sinkz-payment-heading h2 {
-            color: #111;
-            letter-spacing: -.5px;
-        }
-        .sinkz-home .sinkz-search-inner > p,
-        .sinkz-home .sinkz-section-intro p:not(.eyebrow) {
-            color: #69645d;
-        }
-        .sinkz-home .sinkz-search-form input {
-            border-radius: 2px;
-            border-color: #d5cbbb;
-            background: #fbf9f4;
-        }
-        .sinkz-home .sinkz-category-section {
-            background: #f7f3eb;
-            padding-top: 76px;
-            padding-bottom: 82px;
-        }
-        .sinkz-home .sinkz-section-intro { margin-bottom: 38px; }
-        .sinkz-home .sinkz-section-intro h2 {
-            font-size: clamp(30px,3.5vw,42px);
-        }
-        .sinkz-home .category-grid { gap: 16px; }
-        .sinkz-home .sinkz-category-section .category-card {
-            min-height: 270px;
-            border-radius: 2px;
-            box-shadow: 0 12px 30px rgba(17,17,17,.12);
-            border: 1px solid rgba(255,255,255,.2);
-            transition: transform .3s ease,box-shadow .3s ease;
-        }
-        .sinkz-home .sinkz-category-section .category-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 38px rgba(17,17,17,.2);
-        }
-        .sinkz-home .sinkz-category-section .category-card::before {
-            background: linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.78));
-        }
-        .sinkz-home .sinkz-category-section .category-card h3 {
-            color: #fff;
-            font-size: 25px;
-            letter-spacing: .2px;
-        }
-        .sinkz-home .sinkz-discovery-section {
-            padding: 76px 6%;
-            background: #eee8dc;
-            border-top: 1px solid #ded5c7;
-            border-bottom: 1px solid #ded5c7;
-        }
-        .sinkz-home .sinkz-discovery-heading {
-            max-width: 650px;
-            margin: 0 auto 34px;
-            text-align: center;
-        }
-        .sinkz-home .sinkz-discovery-heading > p {
-            color: #a9874e;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 2.4px;
-        }
-        .sinkz-home .sinkz-discovery-heading h2 {
-            margin: 8px 0;
-            color: #111;
-            font: 600 clamp(30px,3.5vw,42px)/1.2 "Playfair Display",Georgia,serif;
-        }
-        .sinkz-home .sinkz-discovery-heading > span { color: #69645d; }
-        .sinkz-home .sinkz-discovery-grid { gap: 22px; }
-        .sinkz-home .sinkz-discovery-item {
-            color: #171512;
-            font-weight: 700;
-            letter-spacing: .3px;
-            text-align: center;
-        }
-        .sinkz-home .sinkz-discovery-thumb {
-            width: 100%;
-            max-width: none;
-            aspect-ratio: 4/5;
-            border-radius: 2px;
-            box-shadow: 0 10px 24px rgba(17,17,17,.10);
-            transition: transform .3s ease,box-shadow .3s ease;
-        }
-        .sinkz-home .sinkz-discovery-item:hover .sinkz-discovery-thumb {
-            transform: translateY(-5px);
-            box-shadow: 0 17px 30px rgba(17,17,17,.16);
-        }
-        .sinkz-home .sinkz-discovery-label {
+        .sinkz-home .sinkz-hero-art-inner small {
             display: block;
-            padding-top: 12px;
+            margin-top: 18px;
+            color: #fff;
+            font-size: 10px;
+            letter-spacing: 4px;
         }
-        .sinkz-home .sinkz-featured-section {
-            background: #f7f3eb;
-            padding-top: 78px;
-            padding-bottom: 82px;
+        .sinkz-home .sinkz-search-section,
+        .sinkz-home .sinkz-payment-section { background: #eee8dc; }
+        .sinkz-home .sinkz-search-section {
+            padding: 42px 6%;
+            border-top: 1px solid #ded5c7;
+            border-bottom: 1px solid #ded5c7;
         }
-        .sinkz-home .sinkz-featured-heading h2 {
-            color: #111;
-            font-size: clamp(30px,3.5vw,42px);
-        }
-        .sinkz-home .sinkz-featured-heading > div > p:not(.eyebrow) { color: #69645d; }
-        .sinkz-home .text-link { color: #8e7040; }
-        .sinkz-home .product-card {
-            border: 1px solid #e2d9cb;
+        .sinkz-home .sinkz-search-form { display: flex; gap: 10px; }
+        .sinkz-home .sinkz-search-form input {
+            flex: 1;
+            min-width: 0;
+            padding: 14px 17px;
+            border: 1px solid #d5cbbb;
             border-radius: 2px;
-            box-shadow: 0 8px 22px rgba(17,17,17,.055);
+            background: #fbf9f4;
+            color: #111;
+            font: inherit;
         }
-        .sinkz-home .product-card:hover {
-            box-shadow: 0 16px 30px rgba(17,17,17,.12);
-        }
-        .sinkz-home .product-info h3 { color: #171512; }
-        .sinkz-home .price { color: #8e7040; }
-        .sinkz-home .sinkz-benefits {
+        .sinkz-home .sinkz-search-form button {
+            padding: 12px 22px;
+            border: 1px solid #111;
+            border-radius: 2px;
             background: #111;
             color: #f7f3eb;
-            padding-top: 52px;
-            padding-bottom: 52px;
+            font-weight: 700;
         }
+        .sinkz-home .sinkz-category-section,
+        .sinkz-home .sinkz-featured-section,
+        .sinkz-home .sinkz-faq-section { background: #f7f3eb; }
+        .sinkz-home .sinkz-category-section { padding: 76px 7% 82px; }
+        .sinkz-home .sinkz-section-intro { max-width: 650px; margin: 0 auto 38px; text-align: center; }
+        .sinkz-home .sinkz-section-intro h2,
+        .sinkz-home .sinkz-featured-heading h2 { color: #111; font-family: "Playfair Display",Georgia,serif; }
+        .sinkz-home .sinkz-section-intro p:not(.eyebrow) { color: #69645d; line-height: 1.7; }
+        .sinkz-home .category-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; }
+        .sinkz-home .sinkz-category-section .category-card {
+            position: relative;
+            min-height: 250px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 2px;
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            box-shadow: 0 12px 30px rgba(17,17,17,.12);
+        }
+        .sinkz-home .sinkz-category-section .category-card h3 { color: #fff; font-size: 25px; }
+        .sinkz-home .sinkz-featured-section { padding: 78px 7% 82px; }
+        .sinkz-home .sinkz-featured-heading h2 { font-size: clamp(30px,3.5vw,42px); }
+        .sinkz-home .sinkz-discovery-section { padding: 76px 6%; background: #eee8dc; border-block: 1px solid #ded5c7; }
+        .sinkz-home .sinkz-discovery-grid { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 18px; }
+        .sinkz-home .sinkz-discovery-item { color: #171512; font-weight: 700; text-align: center; text-decoration: none; }
+        .sinkz-home .sinkz-discovery-thumb { width: 100%; max-width: none; aspect-ratio: 4/5; border-radius: 2px; background-size: cover; background-position: center; }
+        .sinkz-home .sinkz-discovery-label { display: block; padding-top: 12px; }
+        .sinkz-home .sinkz-benefits { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 22px; padding: 52px 7%; background: #111; color: #f7f3eb; }
+        .sinkz-home .sinkz-benefit { text-align: center; }
         .sinkz-home .sinkz-benefit .benefit-icon { color: #c5a46a; }
         .sinkz-home .sinkz-benefit p { color: #d2cabe; }
-        .sinkz-home .sinkz-payment-section {
-            background: #eee8dc;
-            border: 0;
-            padding-top: 76px;
-            padding-bottom: 76px;
-        }
-        .sinkz-home .sinkz-payment-card {
-            background: #f9f6ef;
-            border: 1px solid #ded5c7;
-            border-radius: 2px;
-            box-shadow: 0 10px 26px rgba(17,17,17,.06);
-        }
+        .sinkz-home .sinkz-payment-section { padding: 76px 6%; }
+        .sinkz-home .sinkz-payment-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; max-width: 1050px; margin: 30px auto 0; }
+        .sinkz-home .sinkz-payment-card { padding: 28px 20px; background: #f9f6ef; border: 1px solid #ded5c7; border-radius: 2px; }
         .sinkz-home .sinkz-payment-card h3 { color: #171512; }
-        .sinkz-home .sinkz-payment-card > a {
-            background: #111;
-            color: #f7f3eb;
-            border-radius: 2px;
-        }
-        .sinkz-home .sinkz-payment-card > a:hover { background: #a9874e; color: #111; }
-        .sinkz-home .sinkz-payment-card > a.sinkz-provider-link {
-            background: transparent;
-            color: #29251f;
-            border-color: #b9aa92;
-        }
-        .sinkz-home .sinkz-payment-card > a.sinkz-provider-link:hover {
-            background: #e8dfd0;
-            color: #111;
-        }
-        .sinkz-home .sinkz-faq-section {
-            background: #f7f3eb;
-            padding-top: 76px;
-            padding-bottom: 76px;
-        }
-        .sinkz-home .sinkz-faq-list details {
-            background: #fbf9f4;
-            border: 1px solid #e0d7c9;
-            border-radius: 2px;
-        }
-        .sinkz-home .sinkz-faq-list summary { color: #171512; }
-        .sinkz-home .sinkz-faq-list details p { color: #69645d; }
-        .sinkz-home .sinkz-home > main > .section:last-child {
-            background: #e9e1d3;
-        }
-        .sinkz-home .sinkz-home-hero + .sinkz-search-section { margin-top: 0; }
-        .sinkz-home .site-footer {
-            background: #111;
-            color: #f7f3eb;
-            border-top: 3px solid #b9975b;
-            padding: 46px 6% 25px;
-        }
+        .sinkz-home .sinkz-payment-card p { color: #69645d; }
+        .sinkz-home .sinkz-payment-card a { display: inline-block; margin: 12px 5px 0; color: #29251f; font-weight: 700; text-decoration: none; }
+        .sinkz-home .sinkz-faq-section { padding: 76px 6%; }
+        .sinkz-home .sinkz-faq-list { max-width: 850px; margin: 30px auto 0; }
+        .sinkz-home .sinkz-faq-list details { margin-bottom: 12px; padding: 18px 20px; background: #fbf9f4; border: 1px solid #e0d7c9; border-radius: 2px; }
+        .sinkz-home .sinkz-faq-list summary { color: #171512; font-weight: 700; cursor: pointer; }
+        .sinkz-home .sinkz-faq-list details p { color: #69645d; line-height: 1.7; }
+        .sinkz-home .site-footer { padding: 46px 6% 25px; background: #111; color: #f7f3eb; border-top: 3px solid #b9975b; }
+        .sinkz-home .site-footer .brand { color: #f7f3eb; text-decoration: none; }
         .sinkz-home .site-footer p { color: #d2cabe; }
-        .sinkz-home .sinkz-footer-links a { color: #e8e0d3; }
-        .sinkz-home .sinkz-footer-links a:hover { color: #c5a46a; }
-        .sinkz-home .sinkz-footer-bottom {
-            border-color: rgba(255,255,255,.16);
-            color: #bdb5a8;
+        .sinkz-home .sinkz-footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 18px; margin: 18px 0; }
+        .sinkz-home .sinkz-footer-links a { color: #e8e0d3; text-decoration: none; }
+        .sinkz-home .sinkz-footer-bottom { margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.16); color: #bdb5a8; text-align: center; }
+        @media (max-width: 960px) {
+            .sinkz-home .site-header { gap: 12px; }
+            .sinkz-home .site-header nav#mainNav { gap: 12px; }
+            .sinkz-home .site-header nav#mainNav a { font-size: 12px; }
         }
         @media (max-width: 800px) {
-            .sinkz-home .sinkz-home-hero {
-                background: linear-gradient(180deg,#f7f3eb 0%,#f7f3eb 58%,#eae2d4 58%,#eae2d4 100%);
-            }
-            .sinkz-home .sinkz-category-section .category-card { min-height: 205px; }
-            .sinkz-home .sinkz-discovery-section { padding: 58px 5%; }
-            .sinkz-home .sinkz-featured-section,
-            .sinkz-home .sinkz-payment-section,
-            .sinkz-home .sinkz-faq-section { padding-top: 58px; padding-bottom: 58px; }
+            .sinkz-home .sinkz-home-hero { grid-template-columns: 1fr; background: linear-gradient(180deg,#f7f3eb 0%,#f7f3eb 58%,#eae2d4 58%,#eae2d4 100%); }
+            .sinkz-home .sinkz-hero-art { min-height: 300px; }
+            .sinkz-home .category-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+            .sinkz-home .sinkz-benefits { grid-template-columns: 1fr; gap: 18px; }
+            .sinkz-home .sinkz-payment-grid { grid-template-columns: 1fr; }
+            .sinkz-home .sinkz-discovery-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
         }
         @media (max-width: 560px) {
-            .sinkz-home .sinkz-announcement { font-size: 9px; letter-spacing: 1.1px; }
-            .sinkz-home .sinkz-home-hero { padding-left: 6%; padding-right: 6%; }
-            .sinkz-home .hero-copy h1 { font-size: clamp(38px,10vw,50px); }
+            .sinkz-home .site-header {
+                min-height: 64px;
+                height: auto;
+                padding: 10px 4%;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .sinkz-home .site-header .brand { order: 1; font-size: 16px; letter-spacing: 1.3px; }
+            .sinkz-home .menu-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                order: 2;
+                margin-left: auto;
+            }
+            .sinkz-home .site-header nav#mainNav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                width: 100%;
+                margin: 0;
+                padding: 12px 6% 18px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0;
+                background: #f7f3eb;
+                border-bottom: 1px solid #ded5c7;
+                box-shadow: 0 14px 22px rgba(17,17,17,.12);
+            }
+            .sinkz-home .site-header nav#mainNav.active { display: flex; }
+            .sinkz-home .site-header nav#mainNav a {
+                display: block;
+                width: 100%;
+                padding: 13px 0;
+                border-bottom: 1px solid #e7dfd2;
+                font-size: 14px;
+            }
+            .sinkz-home .sinkz-header-tools { order: 3; }
+            .sinkz-home .sinkz-header-tools .cart-button { padding: 8px 10px; font-size: 11px; }
+            .sinkz-home .sinkz-home-hero { padding: 42px 6%; }
+            .sinkz-home .sinkz-home-hero .hero-copy h1 { font-size: clamp(38px,10vw,50px); }
+            .sinkz-home .sinkz-home-hero .hero-copy > p:not(.eyebrow) { font-size: 14px; line-height: 1.75; }
             .sinkz-home .sinkz-hero-art { min-height: 245px; }
+            .sinkz-home .sinkz-search-form { flex-direction: column; }
+            .sinkz-home .sinkz-search-form button { width: 100%; min-height: 46px; }
+            .sinkz-home .sinkz-category-section { padding: 54px 5% 60px; }
             .sinkz-home .sinkz-category-section .category-card { min-height: 165px; padding: 16px; }
             .sinkz-home .sinkz-category-section .category-card h3 { font-size: 20px; }
-            .sinkz-home .sinkz-discovery-grid { gap: 16px; }
+            .sinkz-home .sinkz-discovery-section { padding: 55px 5%; }
+            .sinkz-home .sinkz-discovery-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
             .sinkz-home .sinkz-discovery-thumb { aspect-ratio: 4/3; }
+            .sinkz-home .sinkz-payment-section,
+            .sinkz-home .sinkz-faq-section { padding: 55px 5%; }
             .sinkz-home .sinkz-footer-links { gap: 12px 16px; }
         }
 
@@ -1538,6 +1589,8 @@
 
                     const isOpen =
                         navigation.classList.contains("active");
+
+                    navigation.classList.toggle("active", !isOpen);
 
                     menuButton.setAttribute(
                         "aria-expanded",
