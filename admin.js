@@ -184,6 +184,97 @@ document.addEventListener("DOMContentLoaded", () => {
     return [...new Set(cleaned)];
   }
 
+  // Remove only images owned by this Supabase bucket and no longer
+  // referenced by any product. Database records are always updated/deleted
+  // first, so a failed Storage cleanup cannot undo a successful catalogue save.
+  function getProductImageStoragePath(url) {
+    const safeURL = safeImageURL(url);
+
+    if (!safeURL) return null;
+
+    try {
+      const parsed = new URL(safeURL);
+      const projectOrigin = new URL(SUPABASE_URL).origin;
+      const prefix =
+        `/storage/v1/object/public/${STORAGE_BUCKET}/`;
+
+      if (
+        parsed.origin !== projectOrigin ||
+        !parsed.pathname.startsWith(prefix)
+      ) {
+        return null;
+      }
+
+      const encodedPath = parsed.pathname.slice(prefix.length);
+      const path = encodedPath
+        .split("/")
+        .map(segment => decodeURIComponent(segment))
+        .join("/");
+
+      if (
+        !path ||
+        path.split("/").some(segment =>
+          !segment || segment === "." || segment === ".."
+        )
+      ) {
+        return null;
+      }
+
+      return path;
+
+    } catch {
+      return null;
+    }
+  }
+
+  async function removeUnreferencedProductImages(candidateURLs) {
+    const candidates = [...new Set(
+      (candidateURLs || [])
+        .map(safeImageURL)
+        .filter(Boolean)
+    )];
+
+    if (!candidates.length) return;
+
+    const { data, error } = await db
+      .from("products")
+      .select("id, image, images");
+
+    if (error) {
+      console.warn(
+        "Product images were retained because references could not be checked:",
+        error
+      );
+      return;
+    }
+
+    const referencedURLs = new Set();
+
+    (data || []).forEach(product => {
+      normaliseProductImages(product).forEach(url => {
+        referencedURLs.add(url);
+      });
+    });
+
+    const paths = candidates
+      .filter(url => !referencedURLs.has(url))
+      .map(getProductImageStoragePath)
+      .filter(Boolean);
+
+    if (!paths.length) return;
+
+    const { error: storageError } = await db.storage
+      .from(STORAGE_BUCKET)
+      .remove([...new Set(paths)]);
+
+    if (storageError) {
+      console.warn(
+        "Unused product images could not be removed from Storage:",
+        storageError
+      );
+    }
+  }
+
 
   /* =======================================================
      03. DOM REFERENCES AND APPLICATION STATE
@@ -1337,6 +1428,14 @@ document.addEventListener("DOMContentLoaded", () => {
         "Uploading images and saving product..."
       );
 
+      const previousProduct = editId
+        ? products.find(product => String(product.id) === String(editId))
+        : null;
+
+      const previousImages = previousProduct
+        ? normaliseProductImages(previousProduct)
+        : [];
+
       const uploadResult = await uploadProductImages();
 
       const allImages = [
@@ -1389,6 +1488,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         throw result.error;
       }
+
+      const removedImages = previousImages.filter(
+        url => !allImages.includes(url)
+      );
+
+      // Keep any image still referenced by another product.
+      await removeUnreferencedProductImages(removedImages);
 
       showMessage(
         "productMessage",
@@ -1480,6 +1586,10 @@ document.addEventListener("DOMContentLoaded", () => {
           .eq("id", id);
 
         if (error) throw error;
+
+        await removeUnreferencedProductImages(
+          normaliseProductImages(product)
+        );
 
         await loadProducts();
 
