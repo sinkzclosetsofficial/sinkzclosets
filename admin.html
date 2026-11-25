@@ -1878,6 +1878,21 @@ input[type="checkbox"] {
           </section>
 
           <section class="admin-panel">
+            <h3>Platform log baseline — 26 November 2026</h3>
+            <p class="muted">Manual snapshot from the available rolling 24-hour Supabase log window. This is not a live counter and does not automatically refresh. Open Supabase Logs Explorer to inspect current events.</p>
+            <p><strong>Log sources available:</strong> Edge Gateway, Auth, Auth Audit, Postgres, PgBouncer, PostgREST, Storage and Realtime.</p>
+            <div class="activity-list">
+              <p><strong>Edge Gateway:</strong> 238 events; 1 HTTP 4xx response and 0 HTTP 5xx responses in the inspected sample.</p>
+              <p><strong>Authentication:</strong> 1 invalid-credentials response (HTTP 400), consistent with the recent invalid-login test; 1 HTTP 500 on a user lookup reported as a cancelled request. The latter needs observation if it recurs.</p>
+              <p><strong>Database:</strong> log entries included administrator-requested connection termination/restart messages and errors from unsuccessful schema-inspection queries. No evidence in this sample establishes malicious database activity.</p>
+              <p><strong>Storage / PostgREST:</strong> log sources were present; no high-severity errors were returned by the targeted error query.</p>
+            </div>
+            <p><strong>Separate security-advisor finding:</strong> leaked-password protection remains disabled on the current Free plan.</p>
+            <p class="muted">Interpretation: no confirmed compromise was identified in the inspected sample. This is not proof that no attack occurred. A single failed login is not a brute-force pattern, and a cancelled request is not automatically an attack.</p>
+            <p><a href="https://supabase.com/dashboard/project/mpzkiatdejirrjidkdqi/logs/explorer" target="_blank" rel="noopener noreferrer">Open Supabase Logs Explorer ↗</a></p>
+          </section>
+
+          <section class="admin-panel">
             <h3>Severity guide</h3>
             <div class="activity-list">
               <p><span class="status inactive">Critical</span> Confirmed unauthorized administrator access, exposed secret credentials, privilege escalation or data theft.</p>
