@@ -654,7 +654,8 @@ document.addEventListener("DOMContentLoaded", () => {
     reviewsSection: "Reviews",
     announcementsSection: "Announcements",
     storefrontSection: "Storefront",
-    settingsSection: "Settings"
+    settingsSection: "Settings",
+    securitySection: "Cyber Threat Monitoring"
   };
 
   function closeSidebar() {
