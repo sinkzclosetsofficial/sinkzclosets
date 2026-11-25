@@ -1,0 +1,426 @@
+
+/* =====================================================
+   SINKZCLOSETS — CART AND CART DRAWER STYLES
+   Compatible with the existing site theme
+===================================================== */
+
+:root {
+    --cart-ink: var(--ink, #1b2432);
+    --cart-muted: var(--muted, #647084);
+    --cart-paper: var(--paper, #fcfaf7);
+    --cart-soft: var(--soft, #f3efe8);
+    --cart-accent: var(--accent, #d4892a);
+    --cart-royal: var(--royal, #1d4e89);
+    --cart-line: var(--line, #e4ddd3);
+}
+
+/* =====================================================
+   1. CART PAGE
+===================================================== */
+
+#cartItems {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+.cart-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    padding: 20px;
+    background: var(--cart-paper);
+    border: 1px solid var(--cart-line);
+    border-radius: 12px;
+    color: var(--cart-ink);
+}
+
+.cart-row > div:first-child {
+    min-width: 0;
+}
+
+.cart-row strong {
+    display: block;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--cart-ink);
+}
+
+.cart-row .muted {
+    margin: 6px 0 0;
+    color: var(--cart-muted);
+    font-size: 0.9rem;
+}
+
+.cart-row .line-price {
+    font-weight: 700;
+    color: var(--cart-royal);
+    white-space: nowrap;
+}
+
+.cart-quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cart-quantity-controls button {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--cart-line);
+    border-radius: 7px;
+    background: var(--cart-soft);
+    color: var(--cart-ink);
+    font-size: 1.15rem;
+    cursor: pointer;
+}
+
+.cart-quantity-controls button:hover {
+    background: var(--cart-accent);
+    color: #fff;
+}
+
+.cart-quantity-controls span {
+    min-width: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.cart-remove {
+    border: none;
+    background: transparent;
+    color: #b33a3a;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.cart-remove:hover {
+    text-decoration: underline;
+}
+
+.cart-price-unavailable {
+    border-color: #d89b52;
+    background: #fff9ef;
+}
+
+/* =====================================================
+   2. CURRENCY SELECTOR
+===================================================== */
+
+.cart-currency-choice {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid var(--cart-line);
+    border-radius: 12px;
+    background: var(--cart-paper);
+}
+
+.cart-currency-choice label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--cart-ink);
+    font-weight: 700;
+}
+
+#cartCurrencySelector {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    min-height: 46px;
+    padding: 10px 14px;
+    border: 1px solid var(--cart-line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--cart-ink);
+    font: inherit;
+    cursor: pointer;
+}
+
+.cart-currency-choice .muted {
+    margin: 10px 0 0;
+    color: var(--cart-muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+}
+
+/* =====================================================
+   3. CART SUMMARY
+===================================================== */
+
+#cartSummary {
+    margin-top: 24px;
+    padding: 24px;
+    border: 1px solid var(--cart-line);
+    border-radius: 12px;
+    background: var(--cart-paper);
+    color: var(--cart-ink);
+}
+
+#cartSubtotal {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--cart-royal);
+}
+
+#cartSummary a {
+    margin-top: 12px;
+}
+
+.cart-currency-warning {
+    margin-top: 15px;
+    padding: 13px;
+    border-left: 4px solid #d89b52;
+    border-radius: 5px;
+    background: #fff5e6;
+    color: #754b16;
+    line-height: 1.6;
+}
+
+.checkout-unavailable {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* =====================================================
+   4. EMPTY CART
+===================================================== */
+
+#emptyCart {
+    padding: 35px 20px;
+    text-align: center;
+    border: 1px dashed var(--cart-line);
+    border-radius: 12px;
+    color: var(--cart-muted);
+    background: var(--cart-paper);
+}
+
+#emptyCart[hidden],
+#cartSummary[hidden] {
+    display: none !important;
+}
+
+/* =====================================================
+   5. CART DRAWER OVERLAY
+===================================================== */
+
+#cartOverlay,
+.cart-overlay,
+.sinkz-cart-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(0, 0, 0, 0.52);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease,
+                visibility 0.25s ease;
+}
+
+#cartOverlay.open,
+.cart-overlay.open,
+.sinkz-cart-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* =====================================================
+   6. CART DRAWER
+===================================================== */
+
+#cartDrawer,
+.cart-drawer,
+.sinkz-cart-drawer {
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    right: 0;
+    width: min(420px, 92vw);
+    height: 100vh;
+    height: 100dvh;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    background: var(--cart-paper);
+    color: var(--cart-ink);
+    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+    transform: translateX(105%);
+    transition: transform 0.3s ease;
+}
+
+#cartDrawer.open,
+.cart-drawer.open,
+.sinkz-cart-drawer.open {
+    transform: translateX(0);
+}
+
+.cart-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--cart-line);
+}
+
+.cart-drawer-header h2 {
+    margin: 0;
+    font-family: inherit;
+    font-size: 1.35rem;
+    color: var(--cart-ink);
+}
+
+#closeCart {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--cart-line);
+    border-radius: 50%;
+    background: var(--cart-soft);
+    color: var(--cart-ink);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+#sinkzDrawerCurrencyNote,
+#cartCurrencyNote {
+    color: var(--cart-muted);
+    font-size: 0.85rem;
+}
+
+#sinkzDrawerItems,
+#cartDrawerItems {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.cart-drawer-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--cart-line);
+}
+
+.cart-drawer-item strong {
+    color: var(--cart-ink);
+}
+
+.cart-drawer-item .muted {
+    color: var(--cart-muted);
+    font-size: 0.85rem;
+}
+
+.cart-drawer-item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.cart-drawer-item-actions button {
+    padding: 5px 9px;
+    border: 1px solid var(--cart-line);
+    border-radius: 6px;
+    background: var(--cart-soft);
+    color: var(--cart-ink);
+    cursor: pointer;
+}
+
+.cart-drawer-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid var(--cart-line);
+}
+
+.cart-drawer-total {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 0;
+    font-size: 1.05rem;
+}
+
+#sinkzDrawerSubtotal {
+    color: var(--cart-royal);
+}
+
+.cart-drawer-footer a,
+.cart-drawer-footer button {
+    display: block;
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+.cart-drawer-footer .btn-primary {
+    background: var(--cart-royal);
+    color: #fff;
+    border: 1px solid var(--cart-royal);
+}
+
+.cart-drawer-footer .btn-secondary {
+    background: var(--cart-accent);
+    color: #fff;
+    border: 1px solid var(--cart-accent);
+}
+
+.cart-drawer-footer .btn-outline {
+    background: transparent;
+    color: var(--cart-ink);
+    border: 1px solid var(--cart-line);
+}
+
+/* =====================================================
+   7. PAGE SCROLL CONTROL
+===================================================== */
+
+body.cart-drawer-open {
+    overflow: hidden;
+}
+
+/* =====================================================
+   8. MOBILE RESPONSIVENESS
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .cart-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .cart-row .line-price {
+        font-size: 1.05rem;
+    }
+
+    .cart-quantity-controls {
+        justify-content: flex-start;
+    }
+
+    #cartSummary {
+        padding: 18px;
+    }
+
+    .cart-currency-choice {
+        padding: 16px;
+    }
+
+    #cartDrawer,
+    .cart-drawer,
+    .sinkz-cart-drawer {
+        width: 92vw;
+        padding: 18px;
+    }
+}

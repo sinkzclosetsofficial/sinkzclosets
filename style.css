@@ -1,0 +1,1887 @@
+
+/* =====================================================
+   SINKZCLOSETS — COMPLETE GLOBAL STYLESHEET
+   Version: Homepage with dual search and payment methods
+   ===================================================== */
+
+/* =====================================================
+   01. FONTS AND DESIGN VARIABLES
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
+:root {
+    --ink: #1b2432;
+    --muted: #647084;
+    --paper: #fcfaf7;
+    --soft: #f3efe8;
+    --accent: #d4892a;
+    --royal: #1d4e89;
+    --line: #e4ddd3;
+
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', Arial, sans-serif;
+}
+
+
+/* =====================================================
+   02. GLOBAL RESET
+   ===================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.55;
+}
+
+body.cart-drawer-open {
+    overflow: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+img {
+    max-width: 100%;
+}
+
+
+/* =====================================================
+   03. ANNOUNCEMENT BAR
+   ===================================================== */
+
+.sinkz-announcement {
+    background: var(--royal);
+    color: #fff;
+    text-align: center;
+    padding: 8px 12px;
+}
+
+.sinkz-announcement p {
+    margin: 0;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+
+/* =====================================================
+   04. HEADER AND NAVIGATION
+   ===================================================== */
+
+.site-header {
+    min-height: 76px;
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.brand {
+    flex-shrink: 0;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-size: 19px;
+    color: var(--royal);
+}
+
+.brand span {
+    color: var(--accent);
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+nav a {
+    padding: 8px 0;
+    transition: color 0.2s ease;
+}
+
+nav a.active,
+nav a:hover {
+    color: var(--accent);
+}
+
+nav b {
+    background: var(--royal);
+    color: #fff;
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 10px;
+}
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: 0;
+    font-size: 25px;
+    color: var(--royal);
+    padding: 5px;
+}
+
+.sinkz-header-cart {
+    flex-shrink: 0;
+    border: 1px solid var(--royal);
+    background: var(--royal);
+    color: #fff;
+    padding: 10px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.sinkz-header-cart:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+
+/* =====================================================
+   05. HEADER SEARCH
+   ===================================================== */
+
+.sinkz-header-search {
+    display: flex;
+    align-items: center;
+    width: 220px;
+    min-width: 130px;
+    border: 1px solid var(--line);
+    background: #fff;
+}
+
+.sinkz-header-search input {
+    width: 100%;
+    min-width: 0;
+    padding: 10px;
+    border: 0;
+    outline: none;
+    font-size: 12px;
+    background: transparent;
+}
+
+.sinkz-header-search button {
+    flex-shrink: 0;
+    border: 0;
+    background: var(--royal);
+    color: #fff;
+    padding: 8px 13px;
+    font-size: 20px;
+}
+
+.sinkz-header-search button:hover {
+    background: var(--accent);
+}
+
+
+/* =====================================================
+   06. BUTTONS
+   ===================================================== */
+
+.btn {
+    display: inline-block;
+    border: 0;
+    background: var(--royal);
+    color: #fff;
+    padding: 14px 26px;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(29, 78, 137, 0.22);
+    transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+}
+
+.small-btn {
+    display: inline-block;
+    border: 1px solid var(--royal);
+    background: #fff;
+    color: var(--royal);
+    padding: 8px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.small-btn:hover {
+    background: #eef4fb;
+}
+
+.small-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.small-btn.primary:hover {
+    background: var(--royal);
+    border-color: var(--royal);
+}
+
+
+/* =====================================================
+   07. HOMEPAGE HERO
+   ===================================================== */
+
+.hero {
+    min-height: 520px;
+    background: linear-gradient(
+        125deg,
+        #fffdf9 0%,
+        #f7efe2 55%,
+        #ede2d0 100%
+    );
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    padding: 65px 8%;
+    align-items: center;
+    gap: 35px;
+    border-bottom: 1px solid var(--line);
+}
+
+.hero-copy {
+    max-width: 540px;
+}
+
+.eyebrow {
+    font-size: 10px;
+    letter-spacing: 2.4px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 13px;
+}
+
+.hero h1,
+.page-main h1 {
+    font: 600 clamp(38px, 5vw, 64px)/1.08 var(--serif);
+    margin: 0 0 20px;
+    color: var(--ink);
+}
+
+.hero h1 span {
+    color: var(--royal);
+}
+
+.hero-copy > p:not(.eyebrow) {
+    max-width: 430px;
+    color: #525e70;
+    margin-bottom: 30px;
+}
+
+.hero-art {
+    min-height: 350px;
+    background: linear-gradient(
+        135deg,
+        #ecc98e 0%,
+        #c99446 55%,
+        #a87128 100%
+    );
+    display: grid;
+    place-items: center;
+    color: #fff;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 22px 45px rgba(168, 113, 40, 0.22);
+}
+
+.hero-art-inner {
+    font: 700 clamp(34px, 5vw, 60px)/.95 var(--serif);
+    letter-spacing: 5px;
+    text-shadow: 0 4px 18px rgba(82, 52, 12, 0.28);
+}
+
+.hero-art-inner span {
+    color: #fff7e6;
+}
+
+.hero-art-inner small {
+    display: block;
+    font: 600 9px var(--sans);
+    letter-spacing: 4px;
+    margin-top: 22px;
+    color: #fff5df;
+}
+
+
+/* =====================================================
+   08. MAIN HOMEPAGE SEARCH
+   ===================================================== */
+
+.sinkz-main-search {
+    padding: 48px 7%;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+}
+
+.sinkz-search-inner {
+    max-width: 850px;
+    margin: auto;
+    text-align: center;
+}
+
+.sinkz-search-label {
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.sinkz-search-inner h2 {
+    font: 600 34px var(--serif);
+    margin: 8px 0;
+}
+
+.sinkz-search-description {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 22px;
+}
+
+.sinkz-search-box {
+    display: flex;
+    max-width: 650px;
+    margin: auto;
+    border: 1px solid var(--line);
+    background: var(--paper);
+}
+
+.sinkz-search-box input {
+    flex: 1;
+    min-width: 0;
+    padding: 16px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--ink);
+}
+
+.sinkz-search-box input:focus {
+    box-shadow: inset 0 0 0 1px var(--royal);
+}
+
+.sinkz-search-box button {
+    flex-shrink: 0;
+    border: 0;
+    padding: 0 25px;
+    background: var(--royal);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.sinkz-search-box button:hover {
+    background: var(--accent);
+}
+
+.sinkz-search-results {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-top: 25px;
+    text-align: left;
+}
+
+.sinkz-search-results:empty {
+    display: none;
+}
+
+.sinkz-search-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 15px;
+}
+
+
+/* =====================================================
+   09. GENERAL SECTIONS
+   ===================================================== */
+
+.section {
+    padding: 75px 8%;
+}
+
+.section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    margin-bottom: 28px;
+}
+
+.section h2 {
+    font: 600 34px var(--serif);
+    margin: 0;
+    color: var(--ink);
+}
+
+.text-link {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--royal);
+    transition: color 0.2s ease;
+}
+
+.text-link:hover {
+    color: var(--accent);
+}
+
+.soft-section {
+    background: var(--soft);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+
+/* =====================================================
+   10. CATEGORY CARDS
+   ===================================================== */
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.category-card {
+    height: 215px;
+    padding: 23px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: #fff;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 12px 26px rgba(27, 36, 50, 0.12);
+}
+
+.category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 34px rgba(27, 36, 50, 0.18);
+}
+
+.category-clothing {
+    background: linear-gradient(135deg, #1b4988, #3a7bd5);
+}
+
+.category-shoes {
+    background: linear-gradient(135deg, #8c4a27, #d07b49);
+}
+
+.category-bags {
+    background: linear-gradient(135deg, #c69249, #ebd09e);
+    color: #2c2112;
+}
+
+.category-kitchen {
+    background: linear-gradient(135deg, #166658, #2da38e);
+}
+
+.category-card span {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    opacity: .85;
+}
+
+.category-card h3 {
+    font: 600 24px var(--serif);
+    margin: 0;
+}
+
+
+/* =====================================================
+   11. PRODUCT GRID AND PRODUCT CARDS
+   ===================================================== */
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    background: #fff;
+    min-width: 0;
+    border: 1px solid #ebe4da;
+    box-shadow: 0 8px 20px rgba(27, 36, 50, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(27, 36, 50, 0.1);
+}
+
+.product-image {
+    height: 220px;
+    background: #f5f0e8;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    color: #8b8177;
+    font-size: 12px;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-info {
+    padding: 15px;
+}
+
+.product-info small {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.8px;
+}
+
+.product-info h3 {
+    font-size: 14px;
+    margin: 5px 0;
+    color: var(--ink);
+}
+
+.price {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--royal);
+}
+
+.product-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+
+/* =====================================================
+   12. INFORMATION STRIP
+   ===================================================== */
+
+.info-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 38px 8%;
+    background: linear-gradient(120deg, #1b4988, #2660ad);
+    color: #fff;
+}
+
+.info-strip div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-strip strong {
+    color: #ffd796;
+    font-size: 14px;
+}
+
+.info-strip span {
+    color: #e6eef9;
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   13. PAYMENT METHODS
+   ===================================================== */
+
+.sinkz-payment-section {
+    padding: 65px 7%;
+    background: var(--soft);
+    border-top: 1px solid var(--line);
+}
+
+.sinkz-payment-heading {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.sinkz-payment-heading > p {
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.sinkz-payment-heading h2 {
+    font: 600 34px var(--serif);
+    margin: 8px 0;
+}
+
+.sinkz-payment-heading span {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.sinkz-payment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    max-width: 1050px;
+    margin: auto;
+}
+
+.sinkz-payment-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 28px 20px;
+    text-align: center;
+    box-shadow: 0 8px 22px rgba(27, 36, 50, .05);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.sinkz-payment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(27, 36, 50, .10);
+}
+
+.sinkz-payment-logo {
+    width: 90px;
+    height: 65px;
+    margin: 0 auto 18px;
+    display: grid;
+    place-items: center;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.sinkz-mtn {
+    background: #ffcc00;
+    color: #222;
+}
+
+.sinkz-airtel {
+    background: #ed1c24;
+    color: #fff;
+}
+
+.sinkz-capitec {
+    background: #fff;
+    border: 2px solid #e6e6e6;
+    color: #e32929;
+    font-size: 16px;
+}
+
+.sinkz-payment-card h3 {
+    font: 600 21px var(--serif);
+    margin: 0 0 9px;
+}
+
+.sinkz-payment-card p {
+    color: var(--muted);
+    font-size: 12px;
+    min-height: 38px;
+}
+
+.sinkz-payment-card > a {
+    display: block;
+    padding: 11px;
+    margin-top: 12px;
+    background: var(--royal);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    transition: background .2s ease;
+}
+
+.sinkz-payment-card > a:hover {
+    background: var(--accent);
+}
+
+.sinkz-payment-card > a.sinkz-provider-link {
+    background: #fff;
+    color: var(--royal);
+    border: 1px solid var(--royal);
+}
+
+.sinkz-payment-card > a.sinkz-provider-link:hover {
+    background: var(--soft);
+}
+
+.sinkz-payment-note {
+    max-width: 750px;
+    margin: 28px auto 0;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+
+/* =====================================================
+   14. FAQ SECTION
+   ===================================================== */
+
+.sinkz-faq-section {
+    background: #fff;
+}
+
+.sinkz-faq-list {
+    max-width: 850px;
+    margin: auto;
+}
+
+.sinkz-faq-item {
+    border-bottom: 1px solid var(--line);
+    padding: 18px 5px;
+}
+
+.sinkz-faq-item summary {
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.sinkz-faq-item summary:hover {
+    color: var(--accent);
+}
+
+.sinkz-faq-item p {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 13px 0 0;
+}
+
+
+/* =====================================================
+   15. FINAL CALL TO ACTION
+   ===================================================== */
+
+.sinkz-final-cta {
+    padding: 65px 7%;
+    background: linear-gradient(120deg, #1b4988, #142c52);
+    text-align: center;
+    color: #fff;
+}
+
+.sinkz-final-cta > p {
+    color: #ffd796;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.sinkz-final-cta h2 {
+    font: 600 34px var(--serif);
+    margin: 10px auto 25px;
+    max-width: 600px;
+}
+
+.sinkz-final-cta .btn {
+    background: var(--accent);
+    color: #fff;
+}
+
+.sinkz-final-cta .btn:hover {
+    background: #fff;
+    color: var(--royal);
+}
+
+
+/* =====================================================
+   16. FOOTER
+   ===================================================== */
+
+.site-footer {
+    background: #142c52;
+    color: #fff;
+    padding: 38px 8%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.site-footer .brand {
+    color: #fff;
+}
+
+.site-footer p,
+.site-footer small {
+    color: #c5d4ea;
+    font-size: 11px;
+}
+
+.site-footer div {
+    display: flex;
+    gap: 17px;
+    font-size: 11px;
+}
+
+.site-footer div a:hover {
+    color: #ffd796;
+}
+
+.sinkz-footer-brand {
+    display: block !important;
+}
+
+.sinkz-footer-brand p {
+    margin: 7px 0 0;
+}
+
+.sinkz-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 17px;
+}
+
+
+/* =====================================================
+   17. GENERAL CONTENT PAGES
+   ===================================================== */
+
+.page-main {
+    min-height: 65vh;
+}
+
+.page-main h1 {
+    font-size: 46px;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.content-card,
+.form-card {
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 25px;
+    margin: 20px 0;
+    max-width: 680px;
+}
+
+.content-card h2 {
+    font: 600 24px var(--serif);
+}
+
+.notice {
+    background: #fff6e5;
+    border-left: 3px solid var(--accent);
+    padding: 12px;
+    font-size: 12px;
+    color: #785322;
+}
+
+
+/* =====================================================
+   18. SHOP SEARCH AND FILTERS
+   ===================================================== */
+
+.shop-tools {
+    display: flex;
+    gap: 12px;
+    margin: 28px 0;
+}
+
+.shop-tools input,
+.shop-tools select {
+    padding: 12px;
+    border: 1px solid var(--line);
+    background: #fff;
+}
+
+.shop-tools input {
+    flex: 1;
+}
+
+
+/* =====================================================
+   19. PRODUCT DETAILS
+   ===================================================== */
+
+.product-detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 45px;
+    align-items: start;
+}
+
+.detail-image {
+    min-height: 420px;
+    background: var(--soft);
+    display: grid;
+    place-items: center;
+}
+
+.detail-image img {
+    width: 100%;
+    max-height: 550px;
+    object-fit: cover;
+}
+
+.detail-copy h1 {
+    font: 600 42px var(--serif);
+}
+
+.detail-copy label,
+.form-card label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 15px 0;
+}
+
+.detail-copy select,
+.detail-copy input,
+.form-card input,
+.form-card textarea {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--line);
+    margin-top: 6px;
+}
+
+
+/* =====================================================
+   20. FORMS
+   ===================================================== */
+
+.form-card {
+    max-width: 560px;
+}
+
+.form-card .btn {
+    margin-top: 10px;
+}
+
+
+/* =====================================================
+   21. MAIN SHOPPING CART PAGE
+   ===================================================== */
+
+#cartItems {
+    width: 100%;
+}
+
+.cart-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 18px;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+    padding: 17px 0;
+    color: var(--ink);
+}
+
+.cart-row strong {
+    color: var(--ink);
+}
+
+.cart-row .muted {
+    font-size: 12px;
+}
+
+.cart-row .line-price {
+    font-weight: 700;
+    color: var(--royal);
+    white-space: nowrap;
+}
+
+.cart-row button {
+    border: 0;
+    background: none;
+    color: #c83e3e;
+    cursor: pointer;
+}
+
+.cart-row button:hover {
+    color: var(--royal);
+}
+
+.total-line {
+    font-weight: 700;
+    text-align: right;
+    padding: 20px 0;
+    color: var(--royal);
+    font-size: 17px;
+}
+
+.empty {
+    padding: 35px;
+    background: var(--soft);
+    text-align: center;
+}
+
+
+/* =====================================================
+   22. CART CURRENCY SELECTOR
+   ===================================================== */
+
+#cartCurrencyChoice,
+.cart-currency-choice,
+#cartCurrencySelector {
+    width: 100%;
+}
+
+#cartCurrencyChoice,
+.cart-currency-choice {
+    margin: 0 0 22px;
+    padding: 17px;
+    background: var(--soft);
+    border: 1px solid var(--line);
+}
+
+#cartCurrencyChoice label,
+.cart-currency-choice label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 0 0 9px;
+    color: var(--ink);
+}
+
+#cartCurrencySelector {
+    display: block;
+    min-height: 45px;
+    padding: 11px 13px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    border-radius: 0;
+    outline: none;
+}
+
+#cartCurrencySelector:focus {
+    border-color: var(--royal);
+    box-shadow: 0 0 0 3px rgba(29, 78, 137, 0.10);
+}
+
+#cartCurrencyWarning {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fff1e8;
+    border-left: 3px solid #c66a32;
+    color: #82411f;
+    font-size: 12px;
+}
+
+#cartSummary[hidden],
+#emptyCart[hidden] {
+    display: none !important;
+}
+
+
+/* =====================================================
+   23. CART DRAWER — OVERLAY
+   ===================================================== */
+
+#cartOverlay,
+.cart-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background: rgba(15, 25, 40, 0.58);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#cartOverlay.open,
+.cart-overlay.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+
+/* =====================================================
+   24. CART DRAWER — MAIN PANEL
+   ===================================================== */
+
+#cartDrawer,
+.cart-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(430px, 92vw);
+    height: 100vh;
+    height: 100dvh;
+    z-index: 100;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.18);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    transform: translateX(105%);
+    transition: transform 0.35s ease;
+}
+
+#cartDrawer.open,
+.cart-drawer.open {
+    transform: translateX(0);
+}
+
+
+/* =====================================================
+   25. CART DRAWER — HEADER
+   ===================================================== */
+
+.cart-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 22px 24px;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
+}
+
+.cart-drawer-header h2 {
+    margin: 0;
+    font: 600 25px var(--serif);
+    color: var(--royal);
+}
+
+#closeCart {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border: 0;
+    background: var(--soft);
+    color: var(--ink);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 23px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+#closeCart:hover {
+    background: var(--royal);
+    color: #fff;
+}
+
+
+/* =====================================================
+   26. CART DRAWER — CURRENCY INFORMATION
+   ===================================================== */
+
+#sinkzDrawerCurrencyNote {
+    display: block;
+    padding: 13px 22px;
+    background: #fff8eb;
+    color: #785322;
+    font-size: 12px;
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
+}
+
+
+/* =====================================================
+   27. CART DRAWER — PRODUCT LIST
+   ===================================================== */
+
+#sinkzDrawerItems,
+.cart-drawer-items {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 8px 22px;
+}
+
+#sinkzDrawerItems .cart-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 17px 0;
+}
+
+#sinkzDrawerItems strong {
+    display: block;
+    font-size: 14px;
+    color: var(--ink);
+}
+
+#sinkzDrawerItems p {
+    color: var(--muted);
+    font-size: 12px;
+    margin: 5px 0;
+}
+
+#sinkzDrawerItems .line-price {
+    color: var(--royal);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+#sinkzDrawerItems button {
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--royal);
+    padding: 7px 10px;
+    margin: 5px 4px 0 0;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+#sinkzDrawerItems button:hover {
+    background: var(--royal);
+    color: #fff;
+}
+
+#sinkzDrawerItems button:last-child {
+    color: #b63838;
+}
+
+#sinkzDrawerItems button:last-child:hover {
+    background: #b63838;
+    border-color: #b63838;
+    color: #fff;
+}
+
+
+/* =====================================================
+   28. CART DRAWER — FOOTER AND TOTAL
+   ===================================================== */
+
+.cart-drawer-footer {
+    padding: 20px 22px 25px;
+    background: #fff;
+    border-top: 1px solid var(--line);
+    flex-shrink: 0;
+}
+
+.cart-drawer-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 17px;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--royal);
+}
+
+#sinkzDrawerSubtotal {
+    font-size: 19px;
+    white-space: nowrap;
+}
+
+.cart-drawer-footer a {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.cart-drawer-footer .btn {
+    padding: 13px 18px;
+}
+
+#continueShopping {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--royal);
+    background: #fff;
+    color: var(--royal);
+    padding: 12px;
+    font-weight: 700;
+    font-size: 12px;
+    text-align: center;
+}
+
+#continueShopping:hover {
+    background: var(--soft);
+}
+
+
+/* =====================================================
+   29. CART DRAWER — EMPTY STATE
+   ===================================================== */
+
+#sinkzDrawerItems .empty,
+#sinkzDrawerItems .cart-empty {
+    padding: 30px 15px;
+    background: var(--soft);
+    color: var(--muted);
+    text-align: center;
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   30. ACCESSIBILITY
+   ===================================================== */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+
+/* =====================================================
+   31. TABLET RESPONSIVENESS
+   ===================================================== */
+
+@media (max-width: 960px) {
+
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .site-header {
+        gap: 12px;
+    }
+
+    nav {
+        gap: 14px;
+    }
+
+    .sinkz-header-search {
+        width: 180px;
+    }
+
+}
+
+
+/* =====================================================
+   32. SMALL LAPTOPS AND TABLETS
+   ===================================================== */
+
+@media (max-width: 800px) {
+
+    .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hero {
+        padding: 45px 6%;
+        min-height: 430px;
+    }
+
+    .hero-art {
+        min-height: 270px;
+    }
+
+    .section {
+        padding: 55px 6%;
+    }
+
+    .product-image {
+        height: 190px;
+    }
+
+    .sinkz-header-search {
+        width: 150px;
+    }
+
+    .sinkz-payment-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =====================================================
+   33. MOBILE NAVIGATION AND RESPONSIVENESS
+   ===================================================== */
+
+@media (max-width: 560px) {
+
+    .site-header {
+        min-height: 65px;
+        height: 65px;
+        padding: 0 5%;
+        gap: 10px;
+    }
+
+    .brand {
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+
+    .menu-toggle {
+        display: block;
+        order: 4;
+    }
+
+    .sinkz-header-search {
+        display: none;
+    }
+
+    .sinkz-header-cart {
+        margin-left: auto;
+        padding: 9px 11px;
+    }
+
+    /* Mobile navigation closed by default */
+
+    nav#mainNav {
+        display: none;
+        position: absolute;
+        top: 65px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background: #fff;
+        padding: 18px 6%;
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 12px 20px rgba(27, 36, 50, .10);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        z-index: 60;
+    }
+
+    /* IMPORTANT:
+       store.js toggles the active class.
+       This CSS must use active, not open.
+    */
+
+    nav#mainNav.active {
+        display: flex;
+    }
+
+    nav#mainNav a {
+        display: block;
+        width: 100%;
+        padding: 9px 0;
+    }
+
+    /* Hero */
+
+    .hero {
+        grid-template-columns: 1fr;
+        padding: 48px 7%;
+    }
+
+    .hero-art {
+        min-height: 180px;
+    }
+
+    .hero h1 {
+        font-size: 43px;
+    }
+
+    /* Main search */
+
+    .sinkz-main-search {
+        padding: 35px 6%;
+    }
+
+    .sinkz-search-inner h2 {
+        font-size: 25px;
+    }
+
+    .sinkz-search-box input {
+        padding: 13px 10px;
+        font-size: 12px;
+    }
+
+    .sinkz-search-box button {
+        padding: 0 13px;
+    }
+
+    .sinkz-search-results {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    /* Sections */
+
+    .section-heading {
+        align-items: start;
+        gap: 15px;
+        flex-direction: column;
+    }
+
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .category-card {
+        height: 145px;
+    }
+
+    /* Products */
+
+    .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 11px;
+    }
+
+    .product-image {
+        height: 160px;
+    }
+
+    .product-info {
+        padding: 10px;
+    }
+
+    .product-info h3 {
+        font-size: 12px;
+    }
+
+    .product-actions {
+        flex-direction: column;
+    }
+
+    /* Benefits */
+
+    .info-strip {
+        grid-template-columns: 1fr;
+        padding: 28px 7%;
+    }
+
+    /* Payment methods */
+
+    .sinkz-payment-section {
+        padding: 45px 6%;
+    }
+
+    .sinkz-payment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sinkz-payment-heading h2 {
+        font-size: 29px;
+    }
+
+    /* FAQ */
+
+    .sinkz-faq-section {
+        padding: 45px 6%;
+    }
+
+    /* Final call to action */
+
+    .sinkz-final-cta {
+        padding: 45px 6%;
+    }
+
+    .sinkz-final-cta h2 {
+        font-size: 27px;
+    }
+
+    /* Footer */
+
+    .site-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .site-footer div {
+        flex-wrap: wrap;
+    }
+
+    .page-main h1 {
+        font-size: 38px;
+    }
+
+    .shop-tools {
+        flex-direction: column;
+    }
+
+    .product-detail {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .detail-image {
+        min-height: 280px;
+    }
+
+    /* Main cart page */
+
+    .cart-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+    }
+
+    .cart-row .line-price {
+        grid-column: 1;
+    }
+
+    .cart-row button {
+        grid-column: 2;
+        grid-row: 1 / 3;
+    }
+
+    .total-line {
+        font-size: 15px;
+    }
+
+    #cartCurrencyChoice,
+    .cart-currency-choice {
+        padding: 14px;
+    }
+
+    /* Cart drawer */
+
+    #cartDrawer,
+    .cart-drawer {
+        width: min(420px, 94vw);
+    }
+
+    .cart-drawer-header {
+        padding: 18px;
+    }
+
+    .cart-drawer-header h2 {
+        font-size: 22px;
+    }
+
+    #sinkzDrawerCurrencyNote {
+        padding: 12px 17px;
+    }
+
+    #sinkzDrawerItems {
+        padding: 8px 17px;
+    }
+
+    .cart-drawer-footer {
+        padding: 16px 17px 20px;
+    }
+
+    .cart-drawer-total {
+        font-size: 15px;
+    }
+
+    #sinkzDrawerSubtotal {
+        font-size: 17px;
+    }
+
+}
+
+
+/* =====================================================
+   END OF SINKZCLOSETS GLOBAL STYLESHEET
+   ===================================================== */
+
+/* =====================================================
+   SINKZCLOSETS — ISOLATED STYLE DISCOVERY SECTION
+   Does not modify existing category or product styles.
+   ===================================================== */
+
+.sinkz-discovery-section {
+    width: 100%;
+    padding: 48px 20px;
+    background: #ffffff;
+    box-sizing: border-box;
+}
+
+.sinkz-discovery-heading {
+    text-align: center;
+    margin: 0 auto 30px;
+}
+
+.sinkz-discovery-heading p {
+    color: #a17b4b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin: 0 0 9px;
+}
+
+.sinkz-discovery-heading h2 {
+    color: #1b2432;
+    font-family: "Playfair Display", serif;
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: 600;
+    margin: 0 0 9px;
+}
+
+.sinkz-discovery-heading span {
+    color: #647084;
+    font-size: 13px;
+}
+
+.sinkz-discovery-grid {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.sinkz-discovery-item {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: #252525;
+}
+
+.sinkz-discovery-thumb {
+    width: 100%;
+    max-width: 112px;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.045);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+/* Six separate muted colours */
+
+.sinkz-discovery-rose {
+    background-color: #EADBD8;
+}
+
+.sinkz-discovery-blue {
+    background-color: #DCE3EB;
+}
+
+.sinkz-discovery-ivory {
+    background-color: #EAE6DA;
+}
+
+.sinkz-discovery-grey {
+    background-color: #DFDFDF;
+}
+
+.sinkz-discovery-lavender {
+    background-color: #E8DCE9;
+}
+
+.sinkz-discovery-sage {
+    background-color: #DDE7DF;
+}
+
+/* Temporary image placeholders */
+
+.sinkz-discovery-placeholder {
+    color: #454545;
+    font-family: "Playfair Display", serif;
+    font-size: 34px;
+    font-weight: 600;
+}
+
+/* Category labels */
+
+.sinkz-discovery-label {
+    color: #252525;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* Hover effect */
+
+@media (hover: hover) {
+    .sinkz-discovery-item:hover
+    .sinkz-discovery-thumb {
+        transform: translateY(-4px);
+        box-shadow: 0 7px 18px rgba(0, 0, 0, 0.09);
+    }
+
+    .sinkz-discovery-item:hover
+    .sinkz-discovery-label {
+        color: #a17b4b;
+    }
+}
+
+/* Tablet layout */
+
+@media (max-width: 760px) {
+    .sinkz-discovery-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px 14px;
+        max-width: 520px;
+    }
+
+    .sinkz-discovery-thumb {
+        max-width: 100px;
+    }
+}
+
+/* Small mobile layout */
+
+@media (max-width: 380px) {
+    .sinkz-discovery-section {
+        padding: 36px 12px;
+    }
+
+    .sinkz-discovery-grid {
+        gap: 22px 9px;
+    }
+
+    .sinkz-discovery-thumb {
+        max-width: 86px;
+    }
+
+    .sinkz-discovery-label {
+        font-size: 12px;
+    }
+}
