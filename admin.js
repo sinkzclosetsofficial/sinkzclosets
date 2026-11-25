@@ -203,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedImageFiles = [];
 
   let isSavingProduct = false;
-  let isCheckingSession = false;
   let dashboardLoadInProgress = false;
 
 
@@ -412,31 +411,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  db.auth.onAuthStateChange((event, session) => {
+  // Keep this listener synchronous. Supabase warns against running
+  // additional Supabase requests inside an auth-state callback because
+  // doing so can block the auth lock during sign-in.
+  //
+  // The login form verifies newly signed-in users explicitly, while
+  // restoreSession() verifies an existing session during page startup.
+  db.auth.onAuthStateChange(event => {
 
     if (event === "SIGNED_OUT") {
       currentUser = null;
       showLogin();
-      return;
-    }
-
-    if (
-      event === "SIGNED_IN" &&
-      session?.user &&
-      !currentUser &&
-      !isCheckingSession
-    ) {
-      isCheckingSession = true;
-
-      Promise.resolve()
-        .then(() => establishAdminSession(session.user))
-        .catch(error => {
-          console.error(error);
-          showLogin();
-        })
-        .finally(() => {
-          isCheckingSession = false;
-        });
     }
 
   });
