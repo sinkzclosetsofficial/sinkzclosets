@@ -13,6 +13,7 @@
 
     <link rel="stylesheet" href="style.css">
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script defer src="store.js"></script>
     <script defer src="analytics.js"></script>
 
@@ -432,6 +433,110 @@
                 font-size: 13px;
             }
         }
+
+        /* Editorial fashion photography for the homepage */
+        .sinkz-home-hero .sinkz-hero-art {
+            background:
+                linear-gradient(90deg, rgba(15,18,24,.58), rgba(15,18,24,.12)),
+                url("https://images.unsplash.com/photo-1529139574466-a303027c1d8f?auto=format&fit=crop&w=1200&q=85") center 38% / cover no-repeat;
+        }
+        .sinkz-home-hero .sinkz-hero-art::before,
+        .sinkz-home-hero .sinkz-hero-art::after { display:none; }
+        .sinkz-category-section .category-card {
+            position:relative;
+            overflow:hidden;
+            isolation:isolate;
+            background-size:cover;
+            background-position:center;
+            border-radius:10px;
+            min-height:230px;
+        }
+        .sinkz-category-section .category-card::before {
+            content:"";
+            position:absolute;
+            inset:0;
+            z-index:-1;
+            background:linear-gradient(180deg,rgba(10,12,16,.08),rgba(10,12,16,.76));
+            transition:background .25s ease;
+        }
+        .sinkz-category-section .category-card:hover::before {
+            background:linear-gradient(180deg,rgba(10,12,16,.02),rgba(10,12,16,.82));
+        }
+        .sinkz-category-section .category-clothing {
+            background-image:url("https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80");
+        }
+        .sinkz-category-section .category-shoes {
+            background-image:url("https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80");
+        }
+        .sinkz-category-section .category-bags {
+            background-image:url("https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=80");
+        }
+        .sinkz-category-section .category-kitchen {
+            background-image:url("https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=900&q=80");
+        }
+        .sinkz-discovery-thumb {
+            max-width:150px;
+            border-radius:12px;
+            aspect-ratio:4 / 5;
+            background-size:cover;
+            background-position:center;
+            box-shadow:0 8px 22px rgba(20,25,32,.10);
+        }
+        .sinkz-discovery-placeholder { display:none; }
+        .sinkz-discovery-rose {
+            background-image:url("https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=500&q=80");
+        }
+        .sinkz-discovery-blue {
+            background-image:url("https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=500&q=80");
+        }
+        .sinkz-discovery-ivory {
+            background-image:url("https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=500&q=80");
+        }
+        .sinkz-discovery-grey {
+            background-image:url("https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80");
+        }
+        .sinkz-discovery-lavender {
+            background-image:url("https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=500&q=80");
+        }
+        .sinkz-discovery-sage {
+            background-image:url("https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80");
+        }
+        .sinkz-discovery-grid { max-width:1040px; gap:18px; }
+        .sinkz-discovery-item { gap:2px; }
+        .sinkz-payment-card a {
+            display:inline-block;
+            margin:12px 5px 0;
+            color:var(--royal,#1b4988);
+            font-weight:700;
+            text-decoration:none;
+        }
+        .sinkz-payment-card a:hover { text-decoration:underline; }
+        .sinkz-payment-logo {
+            display:inline-flex;
+            min-width:82px;
+            min-height:42px;
+            align-items:center;
+            justify-content:center;
+            margin-bottom:16px;
+            padding:8px 14px;
+            border-radius:8px;
+            font-weight:900;
+            letter-spacing:1px;
+            background:#f5f2ed;
+        }
+        .sinkz-capitec { color:#e1262f; }
+        .sinkz-mtn { color:#111;background:#ffcc00; }
+        .sinkz-airtel { color:#fff;background:#ed1c24; }
+        @media(max-width:800px) {
+            .sinkz-discovery-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+            .sinkz-category-section .category-card { min-height:190px; }
+        }
+        @media(max-width:480px) {
+            .sinkz-discovery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; }
+            .sinkz-discovery-thumb { max-width:100%; width:100%; aspect-ratio:4/3; }
+            .sinkz-category-section .category-card { min-height:165px; padding:17px; }
+        }
+
     </style>
 </head>
 
@@ -872,11 +977,6 @@
             <h3>Airtel Money</h3>
 
             
-            <p>
-                Open Airtel Money App
-            </p>
-            </a>
-
             <a
                 class="sinkz-provider-link"
                 href="https://airtelafricaone.page.link"
@@ -907,7 +1007,8 @@
             <h3>Capitec Bank</h3>
 
             <p>
-                Access Capitec's official banking services.
+                South African banking option for customers who already use Capitec.
+                Confirm cross-border transfer availability and charges with your bank.
             </p>
 
             <a
@@ -1006,10 +1107,11 @@
                         </summary>
 
                         <p>
-                            The displayed methods are MTN Mobile Money,
-                            Airtel Money and Capitec Bank transfer.
-                            Please confirm verified payment instructions
-                            with the shop before making payment.
+                            MTN Mobile Money and Airtel Money are the
+                            displayed Zambian mobile-money options.
+                            Capitec is a South African banking option;
+                            confirm cross-border transfer availability,
+                            fees and recipient details before paying.
                         </p>
                     </details>
 
@@ -1077,6 +1179,7 @@
                 <a href="about.html">About & Contact</a>
                 <a href="privacy.html">Privacy</a>
                 <a href="terms.html">Terms</a>
+                <a href="about.html#contact">Contact</a>
             </div>
 
             <div class="sinkz-footer-bottom">
