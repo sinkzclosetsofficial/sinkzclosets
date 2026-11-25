@@ -407,6 +407,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "adminIdentity",
       currentUser?.email || "Administrator"
     );
+    setText("currentAdminEmail", currentUser?.email || "Not signed in");
 
     loadDashboardData();
   }
@@ -2113,9 +2114,6 @@ document.addEventListener("DOMContentLoaded", () => {
       button.textContent = "Change administrator email";
     }
   });
-
-  setText("currentAdminEmail", currentUser?.email || "Not signed in");
-
 
   /* =======================================================
      26. MODULES NOT YET CONNECTED
