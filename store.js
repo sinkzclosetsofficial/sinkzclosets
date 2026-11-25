@@ -240,14 +240,11 @@
     function isStockConfirmed(product) {
         if (!product) return false;
 
-        const explicitlyConfirmed =
-            product.stockConfirmed === true ||
-            product.stock_confirmed === true ||
-            product.availabilityConfirmed === true;
-
-        const stock = getStockQuantity(product);
-
-        return explicitlyConfirmed && stock !== null;
+        // The products table has a required, non-null integer "stock" column.
+        // Admin product creation validates and saves this quantity directly.
+        // There is no separate stock-confirmation column in the current schema,
+        // so a valid persisted stock quantity is the confirmation source.
+        return getStockQuantity(product) !== null;
     }
 
     function normaliseProduct(product) {
