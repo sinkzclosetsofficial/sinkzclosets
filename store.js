@@ -3,8 +3,9 @@
    SINKZCLOSETS — CENTRAL STORE
    Catalogue, cart, ZMW/ZAR currency and cart drawer
 
-   CURRENT MODE:
-   - Local storage only; Supabase is not connected yet.
+   LIVE CATALOGUE:
+   - Public active products are loaded from Supabase.
+   - A local cache keeps the storefront usable during temporary outages.
    - No automatic sample-product creation.
    - ZMW and ZAR prices are independent.
    - Missing prices remain unavailable.
@@ -24,6 +25,32 @@
 
     const DEFAULT_CURRENCY = "ZMW";
     const VALID_CURRENCIES = ["ZMW", "ZAR"];
+
+    const SUPABASE_URL =
+        "https://mpzkiatdejirrjidkdqi.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+        "sb_publishable_9Lpund59NwZAcpZyiCdxPg_D8fohkXR";
+
+    let supabaseClient = null;
+
+    function getSupabaseClient() {
+        if (supabaseClient) return supabaseClient;
+
+        if (
+            !window.supabase ||
+            typeof window.supabase.createClient !== "function"
+        ) {
+            return null;
+        }
+
+        supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY
+        );
+
+        return supabaseClient;
+    }
 
     /* =====================================================
        2. GENERAL HELPERS
@@ -1444,8 +1471,85 @@
 
         // Product display
         createProductCard: createProductCard,
-        displayFeaturedProducts: displayFeaturedProducts
+        displayFeaturedProducts: displayFeaturedProducts,
+        refreshProductsFromSupabase: refreshProductsFromSupabase
     };
+
+    /* =====================================================
+       21. LIVE SUPABASE PRODUCT CATALOGUE
+    ===================================================== */
+
+    async function refreshProductsFromSupabase() {
+        const client = getSupabaseClient();
+
+        if (!client) {
+            console.warn(
+                "SINKZCLOSETS: Supabase client unavailable; using cached products."
+            );
+            return false;
+        }
+
+        try {
+            const { data, error } = await client
+                .from("products")
+                .select("*")
+                .eq("status", "active")
+                .order("created_at", { ascending: false });
+
+            if (error) throw error;
+
+            const liveProducts = (data || []).map(function (product) {
+                const images = Array.isArray(product.images)
+                    ? product.images
+                    : [];
+
+                return Object.assign({}, product, {
+                    price_zmw:
+                        product.price_zmw !== undefined &&
+                        product.price_zmw !== null
+                            ? product.price_zmw
+                            : product.price,
+                    image: product.image || images[0] || "",
+                    images: images
+                });
+            });
+
+            if (!writeStorage(PRODUCTS_KEY, liveProducts)) {
+                throw new Error(
+                    "The latest catalogue could not be saved to the local cache."
+                );
+            }
+
+            updateCartCount();
+            renderCartDrawer();
+            displayFeaturedProducts();
+
+            window.dispatchEvent(
+                new CustomEvent("sinkz:products-updated", {
+                    detail: {
+                        source: "supabase",
+                        count: liveProducts.length
+                    }
+                })
+            );
+
+            console.info(
+                "SINKZCLOSETS: Loaded " +
+                liveProducts.length +
+                " active products from Supabase."
+            );
+
+            return true;
+
+        } catch (error) {
+            console.error(
+                "SINKZCLOSETS: Live product loading failed; cached catalogue retained.",
+                error
+            );
+
+            return false;
+        }
+    }
 
     /* =====================================================
        21. INITIALISE STORE
@@ -1462,6 +1566,10 @@
         updateCartCount();
         renderCartDrawer();
         displayFeaturedProducts();
+
+        // Load the public live catalogue after the page is ready.
+        // Cached products remain visible if the network is unavailable.
+        refreshProductsFromSupabase();
     }
 
     if (document.readyState === "loading") {
