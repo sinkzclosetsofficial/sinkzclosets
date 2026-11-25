@@ -85,12 +85,28 @@
 
         productDescription.textContent = product.description;
 
-        if (product.image) {
+        const productImageURL =
+            product.image ||
+            (
+                Array.isArray(product.images) &&
+                product.images.find(url =>
+                    typeof url === "string" && url.trim()
+                )
+            ) ||
+            "";
+
+        if (productImageURL) {
 
             const image = document.createElement("img");
 
-            image.src = product.image;
+            image.src = productImageURL;
             image.alt = product.name;
+            image.loading = "eager";
+
+            image.onerror = function () {
+                image.remove();
+                productImage.textContent = "Product image unavailable";
+            };
 
             productImage.textContent = "";
             productImage.appendChild(image);
