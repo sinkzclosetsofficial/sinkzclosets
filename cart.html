@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#171717">
+
+    <meta name="description" content="Review your SINKZCLOSETS shopping cart and selected products.">
+
+    <title>Your Cart | SINKZCLOSETS</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script defer src="js/store.js"></script>
+    <script defer src="js/cart.js"></script>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header class="site-header">
+
+        <a class="brand" href="index.html">
+            SINKZ<span>CLOSETS</span>
+        </a>
+
+        <button
+            class="menu-toggle"
+            id="menuToggle"
+            aria-label="Open menu"
+            aria-expanded="false"
+            type="button"
+        >
+            ☰
+        </button>
+
+        <nav id="mainNav">
+
+            <a href="index.html">Home</a>
+
+            <a href="shop.html">Shop</a>
+
+            <a href="about.html">About & Contact</a>
+
+            <a class="active" href="cart.html">
+                Cart <b id="cartCount">0</b>
+            </a>
+
+        </nav>
+
+    </header>
+
+    <!-- MAIN CONTENT -->
+
+    <main class="page-main">
+
+        <section class="section">
+
+            <p class="eyebrow">YOUR SELECTION</p>
+
+            <h1>Your shopping cart.</h1>
+
+            <p class="muted">
+                Review your selected items and quantities before proceeding.
+            </p>
+
+            <div class="content-card cart-page-card">
+
+                <!-- CURRENCY SELECTOR AND CART ITEMS -->
+
+                <div id="cartItems"></div>
+
+                <!-- EMPTY CART -->
+
+                <div id="emptyCart" class="empty" hidden>
+
+                    <h2>Your cart is empty.</h2>
+
+                    <p>
+                        You haven't added any products yet.
+                    </p>
+
+                    <a href="shop.html" class="btn">
+                        Continue shopping
+                    </a>
+
+                </div>
+
+                <!-- CART SUMMARY -->
+
+                <div id="cartSummary" hidden>
+
+                    <div class="total-line">
+
+                        <strong>Subtotal:</strong>
+
+                        <span id="cartSubtotal">K0.00</span>
+
+                    </div>
+
+                    <p class="notice">
+                        Adding products to your cart does not complete an order.
+                        Your order will only be submitted after checkout and
+                        confirmation of the required information.
+                    </p>
+
+                    <div class="cart-page-actions">
+
+                        <a href="shop.html" class="small-btn">
+                            Continue shopping
+                        </a>
+
+                        <a href="checkout.html" class="btn">
+                            Proceed to checkout
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+
+    <footer class="site-footer">
+
+        <a class="brand" href="index.html">
+            SINKZ<span>CLOSETS</span>
+        </a>
+
+        <p>Fashion for your everyday moments.</p>
+
+        <div class="sinkz-footer-links">
+
+            <a href="about.html">About & Contact</a>
+
+            <a href="privacy.html">Privacy</a>
+
+            <a href="terms.html">Terms</a>
+
+            <a href="admin.html">Admin</a>
+
+        </div>
+
+        <small>
+            © <span id="year"></span> Sinkzclosets. All rights reserved.
+        </small>
+
+    </footer>
+
+</body>
+</html>
