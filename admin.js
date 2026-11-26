@@ -725,7 +725,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sectionId === "inventorySection") renderInventory();
 
     if (sectionId === "analyticsSection") {
-      showAnalyticsUnavailable();
+      loadAnalytics();
     }
 
     if (
@@ -2282,7 +2282,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ]);
 
       refreshOverview();
-      showAnalyticsUnavailable();
+      loadAnalytics();
 
     } finally {
 
