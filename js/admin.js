@@ -2353,7 +2353,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const category = scope === "category" ? $("discountCategory").value : null;
     const productId = scope === "product" ? $("discountProduct").value : null;
     if ((scope === "category" && !category) || (scope === "product" && !productId)) { showMessage("discountMessage", "Select the category or product for this campaign.", "error"); return; }
-    const payload = { name, code, description: $("discountDescription").value.trim(), discount_type: type, discount_value: value, currency, max_discount: max, min_subtotal: minimum, scope, category, product_id: productId, starts_at: starts.toISOString(), ends_at: ends.toISOString(), is_active: $("discountActive").value === "true", created_by: currentUser?.id || null, updated_at: new Date().toISOString() };
+    const payload = { name, code, description: $("discountDescription").value.trim(), discount_type: type, discount_value: value, currency, max_discount: max, min_subtotal: minimum, scope, category, product_id: productId, starts_at: starts.toISOString(), ends_at: ends.toISOString(), is_active: $("discountActive").value === "true", updated_at: new Date().toISOString() };
     const button = $("saveDiscountButton"); button.disabled = true;
     try {
       const result = id ? await db.from("discount_campaigns").update(payload).eq("id", id) : await db.from("discount_campaigns").insert(payload);
