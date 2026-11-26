@@ -45,8 +45,8 @@
 
             mtn: {
                 name: "MTN MoMo",
-                number: "+260960451691",
-                accountName: "Josias Sinkonde",
+                number: "0765633293",
+                accountName: "Patricia Zungu",
                 appUrl: "https://appbiz.momo.africa"
             },
 
