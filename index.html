@@ -1583,30 +1583,8 @@
             const navigation =
                 document.getElementById("mainNav");
 
-            /* MOBILE MENU ACCESSIBILITY */
-
-            if (menuButton && navigation) {
-
-                menuButton.addEventListener("click", function () {
-
-                    const isOpen =
-                        navigation.classList.contains("active");
-
-                    navigation.classList.toggle("active", !isOpen);
-
-                    menuButton.setAttribute(
-                        "aria-expanded",
-                        String(!isOpen)
-                    );
-
-                    menuButton.setAttribute(
-                        "aria-label",
-                        isOpen ? "Open menu" : "Close menu"
-                    );
-
-                });
-
-            }
+            /* Mobile menu is initialised once by js/store.js.
+               Do not attach a second click handler here. */
 
             /* HOMEPAGE SEARCH */
 
