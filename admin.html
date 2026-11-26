@@ -1214,9 +1214,39 @@ html[data-theme="light"] .login-card { background: #ffffff; }
         Enter dashboard
       </button>
 
+      <button type="button" id="forgotAdminPassword"
+        class="text-button full-button">
+        Forgot password?
+      </button>
+
       <p id="loginMessage" class="form-message"
         role="status" aria-live="polite"></p>
     </form>
+
+    <section id="passwordRecoveryPanel" class="login-card" hidden>
+      <p class="eyebrow">ACCOUNT RECOVERY</p>
+      <h1>Set a new password</h1>
+      <p class="muted">Choose a new password for your administrator account.</p>
+
+      <form id="passwordRecoveryForm">
+        <label for="recoveryNewPassword">New password</label>
+        <input id="recoveryNewPassword" type="password"
+          autocomplete="new-password" minlength="8" required
+          placeholder="At least 8 characters">
+
+        <label for="recoveryConfirmPassword">Confirm new password</label>
+        <input id="recoveryConfirmPassword" type="password"
+          autocomplete="new-password" minlength="8" required
+          placeholder="Enter the password again">
+
+        <button type="submit" id="saveRecoveryPassword"
+          class="primary-button full-button">
+          Update password
+        </button>
+        <p id="passwordRecoveryMessage" class="form-message"
+          role="status" aria-live="polite"></p>
+      </form>
+    </section>
   </section>
 
 
