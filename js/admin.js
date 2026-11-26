@@ -641,6 +641,49 @@ document.addEventListener("DOMContentLoaded", () => {
   const overlay = $("sidebarOverlay");
   const menuToggle = $("adminMenuToggle");
 
+  const themeToggle = $("adminThemeToggle");
+  const THEME_STORAGE_KEY = "sinkzclosets-admin-theme";
+
+  function applyAdminTheme(theme) {
+    const selectedTheme = theme === "light" ? "light" : "dark";
+    document.documentElement.dataset.theme = selectedTheme;
+
+    if (themeToggle) {
+      const lightMode = selectedTheme === "light";
+      themeToggle.textContent = lightMode ? "☾ Dark mode" : "☀ Light mode";
+      themeToggle.setAttribute(
+        "aria-label",
+        lightMode ? "Switch to dark mode" : "Switch to light mode"
+      );
+      themeToggle.setAttribute("aria-pressed", String(lightMode));
+    }
+
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, selectedTheme);
+    } catch (error) {
+      console.warn("Admin theme preference could not be saved.", error);
+    }
+  }
+
+  let savedAdminTheme = "dark";
+  try {
+    savedAdminTheme = localStorage.getItem(THEME_STORAGE_KEY) || "dark";
+  } catch (error) {
+    console.warn("Admin theme preference could not be read.", error);
+  }
+
+  applyAdminTheme(savedAdminTheme);
+
+  themeToggle?.addEventListener("click", () => {
+    const nextTheme =
+      document.documentElement.dataset.theme === "light"
+        ? "dark"
+        : "light";
+
+    applyAdminTheme(nextTheme);
+  });
+
+
   const sectionTitles = {
     overviewSection: "Overview",
     analyticsSection: "Analytics",
