@@ -8,6 +8,7 @@
     <title>About & Contact | Sinkzclosets</title>
     <link rel="stylesheet" href="css/style.css">
     <script defer src="js/store.js"></script>
+    <script defer src="js/business-settings.js"></script>
 
     
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -71,7 +72,7 @@
 
             <div class="contact-details">
                 <p><strong>WhatsApp:</strong>
-                    <a class="whatsapp-icon-link" href="https://wa.me/260973114929" target="_blank" rel="noopener noreferrer" aria-label="Chat with Sinkzclosets on WhatsApp" title="WhatsApp">
+                    <a class="whatsapp-icon-link" id="businessWhatsAppLink" href="https://wa.me/26097315929" target="_blank" rel="noopener noreferrer" aria-label="Chat with Sinkzclosets on WhatsApp" title="WhatsApp">
                         <svg class="whatsapp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" role="img" aria-hidden="true" focusable="false">
                             <path fill="#25D366" d="M20.52 3.48A11.86 11.86 0 0 0 12.07 0C5.5 0 .15 5.34.15 11.91c0 2.1.55 4.15 1.6 5.96L0 24l6.28-1.65a11.9 11.9 0 0 0 5.78 1.47h.01c6.57 0 11.92-5.35 11.92-11.92 0-3.18-1.24-6.17-3.47-8.42ZM12.07 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.73.98 1-3.64-.24-.38a9.88 9.88 0 0 1-1.52-5.26c0-5.46 4.45-9.9 9.91-9.9 2.65 0 5.14 1.03 7.01 2.9a9.85 9.85 0 0 1 2.9 7.02c0 5.46-4.45 9.9-9.92 9.9Zm5.44-7.42c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.67-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.03-.53-.08-.15-.67-1.62-.92-2.22-.24-.58-.48-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.48.71.3 1.27.49 1.7.62.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2.01-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35Z"/>
                         </svg>
@@ -83,7 +84,7 @@
                 </p>
 
                 <p><strong>Call us (Airtel):</strong>
-                    <a href="tel:+260973114929">+260 973 114 929</a>
+                    <a id="businessAirtelPhone" href="tel:+26097315929">097315929</a>
                 </p>
             </div>
 
@@ -134,5 +135,22 @@
         </small>
     </footer>
 
+<script>
+(function(){
+  async function updateBusinessContacts(){
+    try {
+      const rows = await window.SinkzBusinessSettings?.load?.();
+      if (!rows) return;
+      const wa = rows.find(x => x.setting_type === "whatsapp");
+      const airtel = rows.find(x => x.setting_type === "phone" && x.provider === "airtel");
+      const mtn = rows.find(x => x.setting_type === "phone" && x.provider === "mtn");
+      if (wa?.phone_number) { const n=wa.phone_number.replace(/\\D/g,""); const a=document.getElementById("businessWhatsAppLink"); if(a) a.href="https://wa.me/"+n; }
+      if (airtel?.phone_number) { const a=document.getElementById("businessAirtelPhone"); if(a){a.href="tel:"+airtel.phone_number.replace(/\\s/g,"");a.textContent=airtel.phone_number;} }
+      if (mtn?.phone_number) { const a=document.querySelector('a[href^="tel:+260765"]'); if(a){a.href="tel:"+mtn.phone_number.replace(/\\s/g,"");a.textContent=mtn.phone_number;} }
+    } catch(e) { console.warn("Contact details fallback in use.",e); }
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",updateBusinessContacts); else updateBusinessContacts();
+})();
+</script>
 </body>
 </html>
