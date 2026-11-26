@@ -180,13 +180,27 @@
       const name = document.getElementById("productName");
       const category = document.getElementById("productCategory");
       const id = new URLSearchParams(location.search).get("id") || "";
-      const productName = name ? clean(name.textContent, 150) : "";
-      if (productName && productName !== "Product not found") {
+      let recorded = false;
+
+      function recordProductView() {
+        if (recorded || !name) return;
+        const productName = clean(name.textContent, 150);
+        if (!productName || productName === "Product not found") return;
+        recorded = true;
         track("product_view", {
           product_id: id,
           product_name: productName,
           category: category ? clean(category.textContent, 100) : ""
         });
+      }
+
+      recordProductView();
+      if (name && !recorded && window.MutationObserver) {
+        const observer = new MutationObserver(function () {
+          recordProductView();
+          if (recorded) observer.disconnect();
+        });
+        observer.observe(name, { childList: true, characterData: true, subtree: true });
       }
     }
   }
@@ -203,7 +217,7 @@
     const id = (control.id || "").toLowerCase();
     const classes = typeof control.className === "string" ? control.className.toLowerCase() : "";
     const label = (control.textContent || "").trim().toLowerCase();
-    const addToCart = id.includes("addtocart") || classes.includes("add-to-cart") ||
+    const addToCart = (id.includes("addtocart") || id.includes("addproducttocart")) || classes.includes("add-to-cart") ||
       label.includes("add to cart");
     if (addToCart) {
       track("add_to_cart", {
