@@ -801,6 +801,7 @@ document.addEventListener("DOMContentLoaded", () => {
     customersSection: "Customers",
     reviewsSection: "Reviews",
     announcementsSection: "Announcements",
+    contactPaymentsSection: "Contact & Payment Management",
     storefrontSection: "Storefront",
     settingsSection: "Settings",
     securitySection: "Cyber Threat Monitoring"
@@ -863,6 +864,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (sectionId === "discountsSection") loadDiscountCampaigns();
+    if (sectionId === "contactPaymentsSection") loadBusinessContactPayments();
 
     if (
       sectionId === "ordersSection" ||
@@ -2469,6 +2471,178 @@ document.addEventListener("DOMContentLoaded", () => {
       button.textContent = "Change administrator email";
     }
   });
+
+
+  /* =======================================================
+     BUSINESS CONTACT AND PAYMENT MANAGEMENT
+     ======================================================= */
+
+  const contactPaymentForm = $("businessContactPaymentForm");
+  const contactPaymentList = $("businessContactPaymentList");
+
+  function clearContactPaymentForm() {
+    contactPaymentForm?.reset();
+    setValue("contactPaymentId", "");
+    setValue("contactPaymentOrder", "100");
+    setText("contactPaymentFormTitle", "Add a contact or payment number");
+    setText("saveContactPayment", "Save record");
+    showMessage("contactPaymentMessage", "");
+  }
+
+  async function loadBusinessContactPayments() {
+    if (!contactPaymentList) return;
+    contactPaymentList.innerHTML = '<p class="empty-message">Loading records...</p>';
+    const { data, error } = await db
+      .from("business_contact_payment_settings")
+      .select("*")
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error("Contact/payment settings load failed:", error);
+      contactPaymentList.textContent = "Could not load records. Check database access and try again.";
+      return;
+    }
+
+    if (!data?.length) {
+      contactPaymentList.innerHTML = '<p class="empty-message">No contact or payment records have been added.</p>';
+      return;
+    }
+
+    contactPaymentList.innerHTML = data.map(record => {
+      const value = record.setting_type === "email"
+        ? record.email_address
+        : record.phone_number;
+      const state = record.is_active && !record.deleted_at ? "Active" : "Inactive";
+      return `
+        <article class="admin-panel" style="margin:12px 0">
+          <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <div>
+              <strong>${escapeHTML(record.label)}</strong>
+              <p>${escapeHTML(record.setting_type)} · ${escapeHTML(record.provider)} · ${escapeHTML(value || "")}</p>
+              ${record.recipient_name ? `<p>Recipient: ${escapeHTML(record.recipient_name)}</p>` : ""}
+              <small>${state} · Display order ${Number(record.display_order) || 0}</small>
+            </div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+              <button type="button" class="secondary-button" data-contact-edit="${record.id}">Edit</button>
+              <button type="button" class="secondary-button" data-contact-toggle="${record.id}" data-active="${record.is_active && !record.deleted_at}">
+                ${record.is_active && !record.deleted_at ? "Deactivate" : "Reactivate"}
+              </button>
+              <button type="button" class="secondary-button" data-contact-delete="${record.id}">Delete</button>
+            </div>
+          </div>
+        </article>`;
+    }).join("");
+
+    contactPaymentList.querySelectorAll("[data-contact-edit]").forEach(button => {
+      button.addEventListener("click", () => {
+        const record = data.find(item => item.id === button.dataset.contactEdit);
+        if (!record) return;
+        setValue("contactPaymentId", record.id);
+        setValue("contactPaymentType", record.setting_type);
+        setValue("contactPaymentProvider", record.provider);
+        setValue("contactPaymentLabel", record.label);
+        setValue("contactPaymentNumber", record.phone_number || "");
+        setValue("contactPaymentEmail", record.email_address || "");
+        setValue("contactPaymentRecipient", record.recipient_name || "");
+        setValue("contactPaymentAppUrl", record.app_url || "");
+        setValue("contactPaymentOrder", record.display_order);
+        setText("contactPaymentFormTitle", "Edit contact/payment record");
+        setText("saveContactPayment", "Update record");
+        showMessage("contactPaymentMessage", "Editing selected record.");
+        $("businessContactPaymentForm")?.scrollIntoView({behavior:"smooth",block:"start"});
+      });
+    });
+
+    contactPaymentList.querySelectorAll("[data-contact-toggle]").forEach(button => {
+      button.addEventListener("click", async () => {
+        const record = data.find(item => item.id === button.dataset.contactToggle);
+        if (!record) return;
+        const activate = !(record.is_active && !record.deleted_at);
+        const { error: updateError } = await db
+          .from("business_contact_payment_settings")
+          .update({
+            is_active: activate,
+            deleted_at: activate ? null : new Date().toISOString(),
+            deleted_by: activate ? null : currentUser?.id || null,
+            updated_at: new Date().toISOString(),
+            updated_by: currentUser?.id || null
+          })
+          .eq("id", record.id);
+        if (updateError) {
+          showMessage("contactPaymentMessage", updateError.message, "error");
+          return;
+        }
+        showMessage("contactPaymentMessage", activate ? "Record reactivated." : "Record deactivated.", "success");
+        await loadBusinessContactPayments();
+      });
+    });
+
+    contactPaymentList.querySelectorAll("[data-contact-delete]").forEach(button => {
+      button.addEventListener("click", async () => {
+        const record = data.find(item => item.id === button.dataset.contactDelete);
+        if (!record || !window.confirm("Permanently delete this record? Its audit history will remain.")) return;
+        const { error: deleteError } = await db
+          .from("business_contact_payment_settings")
+          .delete()
+          .eq("id", record.id);
+        if (deleteError) {
+          showMessage("contactPaymentMessage", deleteError.message, "error");
+          return;
+        }
+        showMessage("contactPaymentMessage", "Record permanently deleted.", "success");
+        await loadBusinessContactPayments();
+      });
+    });
+  }
+
+  contactPaymentForm?.addEventListener("submit", async event => {
+    event.preventDefault();
+    const type = $("contactPaymentType")?.value;
+    const emailType = type === "email";
+    const phone = $("contactPaymentNumber")?.value.trim() || null;
+    const email = $("contactPaymentEmail")?.value.trim() || null;
+    const appUrl = $("contactPaymentAppUrl")?.value.trim() || null;
+
+    if (emailType ? !email : !phone) {
+      showMessage("contactPaymentMessage", emailType ? "Enter an email address." : "Enter a phone number.", "error");
+      return;
+    }
+    if (appUrl && !/^https?:\/\//i.test(appUrl)) {
+      showMessage("contactPaymentMessage", "App/contact URL must begin with https:// or http://.", "error");
+      return;
+    }
+
+    const payload = {
+      setting_type: type,
+      provider: $("contactPaymentProvider")?.value,
+      label: $("contactPaymentLabel")?.value.trim(),
+      phone_number: emailType ? null : phone,
+      email_address: emailType ? email : null,
+      recipient_name: $("contactPaymentRecipient")?.value.trim() || null,
+      app_url: appUrl,
+      display_order: Math.max(0, Number($("contactPaymentOrder")?.value || 100)),
+      updated_at: new Date().toISOString(),
+      updated_by: currentUser?.id || null
+    };
+    const id = $("contactPaymentId")?.value;
+    const request = id
+      ? db.from("business_contact_payment_settings").update(payload).eq("id", id)
+      : db.from("business_contact_payment_settings").insert({...payload, created_by: currentUser?.id || null});
+
+    const { error } = await request;
+    if (error) {
+      console.error("Contact/payment save failed:", error);
+      showMessage("contactPaymentMessage", error.message, "error");
+      return;
+    }
+    clearContactPaymentForm();
+    showMessage("contactPaymentMessage", id ? "Record updated successfully." : "Record added successfully.", "success");
+    await loadBusinessContactPayments();
+  });
+
+  $("cancelContactPaymentEdit")?.addEventListener("click", clearContactPaymentForm);
+  $("refreshContactPayments")?.addEventListener("click", loadBusinessContactPayments);
 
   /* =======================================================
      26. MODULES NOT YET CONNECTED
