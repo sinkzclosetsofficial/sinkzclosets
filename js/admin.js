@@ -711,7 +711,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sectionId === "inventorySection") renderInventory();
 
     if (sectionId === "analyticsSection") {
-      showAnalyticsUnavailable();
+      loadAnalytics();
     }
 
     if (
@@ -2005,36 +2005,97 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =======================================================
-     24. ANALYTICS PLACEHOLDER
+     24. SHARED SUPABASE ANALYTICS
      ======================================================= */
 
-  function showAnalyticsUnavailable() {
+  let analyticsLoadInProgress = false;
 
-    setText("analyticsPageViews", "Not connected");
-    setText("analyticsVisitors", "Not connected");
-    setText("analyticsProductViews", "Not connected");
-    setText("analyticsAddToCart", "Not connected");
+  function analyticsPeriodStart() {
+    const period = $("analyticsPeriod")?.value || "7d";
+    if (period === "all") return null;
+    const durations = {
+      "24h": 24 * 60 * 60 * 1000,
+      "7d": 7 * 24 * 60 * 60 * 1000,
+      "30d": 30 * 24 * 60 * 60 * 1000
+    };
+    return new Date(Date.now() - (durations[period] || durations["7d"])).toISOString();
+  }
 
+  function formatAnalyticsTime(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "—";
+    return date.toLocaleString();
+  }
+
+  async function loadAnalytics() {
+    if (!currentUser || analyticsLoadInProgress) return;
+    analyticsLoadInProgress = true;
+    const status = $("analyticsStatus");
     const table = $("analyticsEventsTable");
+    const refresh = $("refreshAnalytics");
 
-    if (table) {
+    if (status) status.textContent = "Loading recorded analytics…";
+    if (refresh) refresh.disabled = true;
 
-      table.innerHTML = `
-        <tbody>
-          <tr>
-            <td>
-              Live analytics are not connected yet.
-              No visitor statistics are being fabricated.
-            </td>
-          </tr>
-        </tbody>
-      `;
+    try {
+      let request = db
+        .from("analytics_events")
+        .select("event_id,event_name,occurred_at,visitor_id,session_id,page_path,page_type,device,browser,traffic_source,product_id,product_name,category")
+        .order("occurred_at", { ascending: false })
+        .limit(10000);
+
+      const start = analyticsPeriodStart();
+      if (start) request = request.gte("occurred_at", start);
+
+      const { data, error } = await request;
+      if (error) throw error;
+
+      const events = data || [];
+      const count = name => events.filter(event => event.event_name === name).length;
+      const unique = field => new Set(events.map(event => event[field]).filter(Boolean)).size;
+
+      setText("analyticsPageViews", count("page_view").toLocaleString());
+      setText("analyticsVisitors", unique("visitor_id").toLocaleString());
+      setText("analyticsProductViews", count("product_view").toLocaleString());
+      setText("analyticsAddToCart", count("add_to_cart").toLocaleString());
+      setText("analyticsCheckoutVisits", count("checkout_visit").toLocaleString());
+      setText("analyticsSessions", unique("session_id").toLocaleString());
+      setText("analyticsTotalEvents", events.length.toLocaleString());
+
+      if (table) {
+        const header = '<thead><tr><th>Event</th><th>Page</th><th>Product</th><th>Device</th><th>Time</th></tr></thead>';
+        if (!events.length) {
+          table.innerHTML = header + '<tbody><tr><td colspan="5">No events recorded for this period yet. Visit the public storefront to generate the first real event.</td></tr></tbody>';
+        } else {
+          const rows = events.slice(0, 100).map(event =>
+            '<tr><td>' + escapeHTML(event.event_name.replace(/_/g, " ")) +
+            '</td><td>' + escapeHTML(event.page_path || "—") +
+            '</td><td>' + escapeHTML(event.product_name || event.product_id || "—") +
+            '</td><td>' + escapeHTML(event.device || "—") +
+            '</td><td>' + escapeHTML(formatAnalyticsTime(event.occurred_at)) +
+            '</td></tr>'
+          ).join("");
+          table.innerHTML = header + "<tbody>" + rows + "</tbody>";
+        }
+      }
+
+      if (status) {
+        status.textContent = "Connected · " + events.length.toLocaleString() +
+          " events loaded" + (events.length === 10000 ? " (display limit reached)" : "") +
+          " · Updated " + new Date().toLocaleTimeString();
+      }
+    } catch (error) {
+      console.error("Analytics loading error:", error);
+      if (status) status.textContent = "Analytics could not be loaded: " + (error.message || "Database request failed");
+      if (table) table.innerHTML = '<thead><tr><th>Event</th><th>Page</th><th>Product</th><th>Device</th><th>Time</th></tr></thead><tbody><tr><td colspan="5">Check analytics_events permissions and administrator access, then refresh.</td></tr></tbody>';
+    } finally {
+      analyticsLoadInProgress = false;
+      if (refresh) refresh.disabled = false;
     }
   }
 
-  $("refreshAnalytics")?.addEventListener("click", () => {
-    showAnalyticsUnavailable();
-  });
+  $("refreshAnalytics")?.addEventListener("click", loadAnalytics);
+  $("analyticsPeriod")?.addEventListener("change", loadAnalytics);
 
 
   /* =======================================================
@@ -2191,7 +2252,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ]);
 
       refreshOverview();
-      showAnalyticsUnavailable();
 
     } finally {
 
