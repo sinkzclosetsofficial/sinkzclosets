@@ -2146,6 +2146,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function loadDiscountCampaigns() {
+    // The campaign editor needs live categories and products even when
+    // Discounts is the first section opened after login.
+    const lookups = [];
+    if (!products.length) lookups.push(loadProducts());
+    if (!categories.length) lookups.push(loadCategories());
+    if (lookups.length) await Promise.all(lookups);
+
     const host = $("discountCampaignList");
     if (host) host.innerHTML = '<p class="empty-message">Loading discount campaigns...</p>';
     fillDiscountScopeOptions();
