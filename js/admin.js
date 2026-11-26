@@ -514,6 +514,128 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 
+  $("forgotAdminPassword")?.addEventListener("click", async () => {
+    const email = String(loginEmail?.value || "").trim().toLowerCase();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showMessage(
+        "loginMessage",
+        "Enter your administrator email address first, then select Forgot password.",
+        "error"
+      );
+      loginEmail?.focus();
+      return;
+    }
+
+    const button = $("forgotAdminPassword");
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Sending recovery email...";
+    }
+
+    try {
+      const recoveryURL = new URL(window.location.href);
+      recoveryURL.search = "?password-recovery=1";
+      recoveryURL.hash = "";
+
+      const { error } = await db.auth.resetPasswordForEmail(email, {
+        redirectTo: recoveryURL.toString()
+      });
+
+      if (error) throw error;
+
+      showMessage(
+        "loginMessage",
+        "If this address belongs to an account, Supabase will send a password-reset email. Check your inbox and spam folder.",
+        "success"
+      );
+    } catch (error) {
+      console.error("Password recovery request error:", error);
+      showMessage(
+        "loginMessage",
+        error.message || "The password-reset request could not be sent. Please try again.",
+        "error"
+      );
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Forgot password?";
+      }
+    }
+  });
+
+  $("passwordRecoveryForm")?.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const password = String($("recoveryNewPassword")?.value || "");
+    const confirmation = String($("recoveryConfirmPassword")?.value || "");
+
+    if (password.length < 8) {
+      showMessage(
+        "passwordRecoveryMessage",
+        "Use a password with at least 8 characters.",
+        "error"
+      );
+      return;
+    }
+
+    if (password !== confirmation) {
+      showMessage(
+        "passwordRecoveryMessage",
+        "The two passwords do not match.",
+        "error"
+      );
+      return;
+    }
+
+    const button = $("saveRecoveryPassword");
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Updating password...";
+    }
+
+    try {
+      const { error } = await db.auth.updateUser({ password });
+      if (error) throw error;
+
+      $("passwordRecoveryForm")?.reset();
+      showMessage(
+        "passwordRecoveryMessage",
+        "Password updated successfully. You can now sign in with your new password.",
+        "success"
+      );
+
+      await db.auth.signOut();
+
+      if (loginForm) loginForm.hidden = false;
+      const recoveryPanel = $("passwordRecoveryPanel");
+      if (recoveryPanel) recoveryPanel.hidden = true;
+
+      const cleanURL = new URL(window.location.href);
+      cleanURL.searchParams.delete("password-recovery");
+      cleanURL.hash = "";
+      window.history.replaceState({}, document.title, cleanURL.toString());
+
+      showMessage(
+        "loginMessage",
+        "Your password has been changed. Sign in using your new password.",
+        "success"
+      );
+    } catch (error) {
+      console.error("Password update error:", error);
+      showMessage(
+        "passwordRecoveryMessage",
+        error.message || "The password could not be updated. Request a new recovery email and try again.",
+        "error"
+      );
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Update password";
+      }
+    }
+  });
+
   /* =======================================================
      05. PASSWORD VISIBILITY
      ======================================================= */
@@ -597,6 +719,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event === "SIGNED_OUT") {
       currentUser = null;
       showLogin();
+    }
+
+    if (event === "PASSWORD_RECOVERY") {
+      if (loginForm) loginForm.hidden = true;
+      const recoveryPanel = $("passwordRecoveryPanel");
+      if (recoveryPanel) recoveryPanel.hidden = false;
+      showLogin();
+      showMessage(
+        "passwordRecoveryMessage",
+        "Recovery link verified. Enter and confirm your new password.",
+        "success"
+      );
     }
 
   });
