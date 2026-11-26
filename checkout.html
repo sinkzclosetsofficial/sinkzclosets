@@ -30,6 +30,15 @@
 
     .checkout-card h2 { margin-top: 0; }
 
+    .discount-code-row { display:flex; gap:8px; align-items:stretch; }
+    .discount-code-row input { min-width:0; flex:1; }
+    .discount-code-row button { padding:10px 16px; border:1px solid var(--ink,#171717); border-radius:6px; background:var(--ink,#171717); color:#fff; font:inherit; cursor:pointer; }
+    .discount-code-row button:disabled { opacity:.55; cursor:wait; }
+    #discountCodeMessage { margin:7px 0 0; }
+    .checkout-final-total { border-top:1px solid var(--line,#ddd); padding-top:12px; font-size:1.08rem; }
+    @media(max-width:420px) { .discount-code-row { flex-direction:column; } }
+
+
     .checkout-field { margin-bottom: 16px; }
 
     .checkout-field label {
@@ -361,9 +370,28 @@
           <p id="checkoutCurrency" class="muted"></p>
           <div id="checkoutItems"></div>
 
+          <div class="checkout-field discount-code-field">
+            <label for="discountCodeInput">Promotional discount code (optional)</label>
+            <div class="discount-code-row">
+              <input id="discountCodeInput" type="text" maxlength="40"
+                autocomplete="off" autocapitalize="characters"
+                placeholder="Enter discount code">
+              <button id="applyDiscountButton" type="button">Apply</button>
+            </div>
+            <p id="discountCodeMessage" class="payment-help" role="status" aria-live="polite"></p>
+          </div>
+
           <div class="checkout-total">
-            <span>Total</span>
-            <span id="checkoutTotal">—</span>
+            <span>Subtotal</span>
+            <span id="checkoutSubtotal">—</span>
+          </div>
+          <div class="checkout-total" id="checkoutDiscountRow" hidden>
+            <span>Discount</span>
+            <span id="checkoutDiscountAmount">—</span>
+          </div>
+          <div class="checkout-total checkout-final-total">
+            <strong>Total</strong>
+            <strong id="checkoutTotal">—</strong>
           </div>
         </aside>
       </div>
