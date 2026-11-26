@@ -1251,21 +1251,41 @@ input[type="checkbox"] {
             <span>Store performance information.</span>
           </div>
 
+          <div class="section-heading section-heading-row">
+            <div>
+              <h3>Reporting period</h3>
+              <span>Shared first-party events recorded across the storefront.</span>
+            </div>
+            <select id="analyticsPeriod" aria-label="Analytics reporting period">
+              <option value="24h">Last 24 hours</option>
+              <option value="7d" selected>Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="all">All recorded activity</option>
+            </select>
+          </div>
+
           <div class="admin-stat-grid">
-            <article class="admin-stat-card"><p>Page views</p><h2 id="analyticsPageViews">0</h2></article>
-            <article class="admin-stat-card"><p>Unique visitors</p><h2 id="analyticsVisitors">0</h2></article>
-            <article class="admin-stat-card"><p>Product views</p><h2 id="analyticsProductViews">0</h2></article>
-            <article class="admin-stat-card"><p>Add-to-cart events</p><h2 id="analyticsAddToCart">0</h2></article>
+            <article class="admin-stat-card"><p>Page views</p><h2 id="analyticsPageViews">—</h2></article>
+            <article class="admin-stat-card"><p>Unique visitors</p><h2 id="analyticsVisitors">—</h2></article>
+            <article class="admin-stat-card"><p>Product views</p><h2 id="analyticsProductViews">—</h2></article>
+            <article class="admin-stat-card"><p>Add-to-cart events</p><h2 id="analyticsAddToCart">—</h2></article>
+            <article class="admin-stat-card"><p>Checkout visits</p><h2 id="analyticsCheckoutVisits">—</h2></article>
+            <article class="admin-stat-card"><p>Recorded sessions</p><h2 id="analyticsSessions">—</h2></article>
+            <article class="admin-stat-card"><p>Total recorded events</p><h2 id="analyticsTotalEvents">—</h2></article>
           </div>
 
           <section class="admin-panel">
             <div class="section-heading">
-              <h2>Analytics events</h2>
+              <div>
+                <h2>Analytics events</h2>
+                <span id="analyticsStatus" role="status">Waiting for analytics data.</span>
+              </div>
               <button type="button" id="refreshAnalytics" class="secondary-button">Refresh metrics</button>
             </div>
             <div class="table-container">
               <table id="analyticsEventsTable" class="admin-table">
-                <tbody><tr><td>Analytics reporting requires an event-tracking integration.</td></tr></tbody>
+                <thead><tr><th>Event</th><th>Page</th><th>Product</th><th>Device</th><th>Time</th></tr></thead>
+                <tbody><tr><td colspan="5">Analytics data will appear after the first tracked visit.</td></tr></tbody>
               </table>
             </div>
           </section>
