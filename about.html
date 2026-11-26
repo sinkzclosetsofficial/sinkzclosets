@@ -144,7 +144,7 @@
       const wa = rows.find(x => x.setting_type === "whatsapp");
       const airtel = rows.find(x => x.setting_type === "phone" && x.provider === "airtel");
       const mtn = rows.find(x => x.setting_type === "phone" && x.provider === "mtn");
-      if (wa?.phone_number) { const n=wa.phone_number.replace(/\\D/g,""); const a=document.getElementById("businessWhatsAppLink"); if(a) a.href="https://wa.me/"+n; }
+      if (wa?.phone_number) { const d=wa.phone_number.replace(/\\D/g,""); const n=d.startsWith("0")?"260"+d.slice(1):d; const a=document.getElementById("businessWhatsAppLink"); if(a) a.href="https://wa.me/"+n; }
       if (airtel?.phone_number) { const a=document.getElementById("businessAirtelPhone"); if(a){a.href="tel:"+airtel.phone_number.replace(/\\s/g,"");a.textContent=airtel.phone_number;} }
       if (mtn?.phone_number) { const a=document.querySelector('a[href^="tel:+260765"]'); if(a){a.href="tel:"+mtn.phone_number.replace(/\\s/g,"");a.textContent=mtn.phone_number;} }
     } catch(e) { console.warn("Contact details fallback in use.",e); }
