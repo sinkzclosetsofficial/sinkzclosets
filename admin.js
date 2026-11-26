@@ -2019,36 +2019,115 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =======================================================
-     24. ANALYTICS PLACEHOLDER
+     24. SHARED FIRST-PARTY ANALYTICS
      ======================================================= */
 
-  function showAnalyticsUnavailable() {
+  function analyticsPeriodStart() {
+    const period = $("analyticsPeriod")?.value || "7d";
+    if (period === "all") return null;
 
-    setText("analyticsPageViews", "Not connected");
-    setText("analyticsVisitors", "Not connected");
-    setText("analyticsProductViews", "Not connected");
-    setText("analyticsAddToCart", "Not connected");
+    const duration = {
+      "24h": 24 * 60 * 60 * 1000,
+      "7d": 7 * 24 * 60 * 60 * 1000,
+      "30d": 30 * 24 * 60 * 60 * 1000
+    }[period] || 7 * 24 * 60 * 60 * 1000;
 
+    return new Date(Date.now() - duration).toISOString();
+  }
+
+  function analyticsCountUnique(rows, field) {
+    return new Set(rows.map(row => row[field]).filter(Boolean)).size;
+  }
+
+  function analyticsFormatTime(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "—";
+    return date.toLocaleString();
+  }
+
+  async function loadAnalytics() {
+    const status = $("analyticsStatus");
     const table = $("analyticsEventsTable");
+    const refresh = $("refreshAnalytics");
 
+    if (refresh) {
+      refresh.disabled = true;
+      refresh.textContent = "Loading...";
+    }
+    if (status) status.textContent = "Loading shared analytics data...";
     if (table) {
+      table.innerHTML = '<thead><tr><th>Event</th><th>Page</th><th>Product</th><th>Device</th><th>Time</th></tr></thead><tbody><tr><td colspan="5">Loading...</td></tr></tbody>';
+    }
 
-      table.innerHTML = `
-        <tbody>
+    try {
+      let query = db
+        .from("analytics_events")
+        .select("event_id,event_name,occurred_at,visitor_id,session_id,page_path,device,product_id,product_name")
+        .order("occurred_at", { ascending: false })
+        .limit(5000);
+
+      const start = analyticsPeriodStart();
+      if (start) query = query.gte("occurred_at", start);
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const events = Array.isArray(data) ? data : [];
+      const pageViews = events.filter(row => row.event_name === "page_view");
+      const productViews = events.filter(row => row.event_name === "product_view");
+      const cartEvents = events.filter(row => row.event_name === "add_to_cart");
+      const checkoutEvents = events.filter(row => row.event_name === "checkout_visit");
+
+      setText("analyticsPageViews", pageViews.length.toLocaleString());
+      setText("analyticsVisitors", analyticsCountUnique(pageViews, "visitor_id").toLocaleString());
+      setText("analyticsProductViews", productViews.length.toLocaleString());
+      setText("analyticsAddToCart", cartEvents.length.toLocaleString());
+      setText("analyticsCheckoutVisits", checkoutEvents.length.toLocaleString());
+      setText("analyticsSessions", analyticsCountUnique(events, "session_id").toLocaleString());
+      setText("analyticsTotalEvents", events.length.toLocaleString());
+
+      if (table) {
+        const recent = events.slice(0, 50);
+        const rows = recent.map(row => `
           <tr>
-            <td>
-              Live analytics are not connected yet.
-              No visitor statistics are being fabricated.
-            </td>
+            <td>${escapeHTML(row.event_name.replace(/_/g, " "))}</td>
+            <td>${escapeHTML(row.page_path || "—")}</td>
+            <td>${escapeHTML(row.product_name || row.product_id || "—")}</td>
+            <td>${escapeHTML(row.device || "—")}</td>
+            <td>${escapeHTML(analyticsFormatTime(row.occurred_at))}</td>
           </tr>
-        </tbody>
-      `;
+        `).join("");
+
+        table.innerHTML = `
+          <thead><tr><th>Event</th><th>Page</th><th>Product</th><th>Device</th><th>Time</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="5">No events have been recorded in this period yet.</td></tr>'}</tbody>
+        `;
+      }
+
+      if (status) {
+        status.textContent = events.length
+          ? `Showing ${events.length.toLocaleString()} recorded events (up to 5,000) for the selected period.`
+          : "Connected successfully. No events have been recorded in this period yet.";
+      }
+
+    } catch (error) {
+      console.error("Analytics load failed:", error);
+      ["analyticsPageViews","analyticsVisitors","analyticsProductViews","analyticsAddToCart","analyticsCheckoutVisits","analyticsSessions","analyticsTotalEvents"]
+        .forEach(id => setText(id, "—"));
+      if (status) status.textContent = "Analytics could not be loaded: " + (error.message || "Unknown database error");
+      if (table) {
+        table.innerHTML = '<thead><tr><th>Analytics events</th></tr></thead><tbody><tr><td>Unable to retrieve analytics. Check administrator access and the database connection, then refresh.</td></tr></tbody>';
+      }
+    } finally {
+      if (refresh) {
+        refresh.disabled = false;
+        refresh.textContent = "Refresh metrics";
+      }
     }
   }
 
-  $("refreshAnalytics")?.addEventListener("click", () => {
-    showAnalyticsUnavailable();
-  });
+  $("refreshAnalytics")?.addEventListener("click", loadAnalytics);
+  $("analyticsPeriod")?.addEventListener("change", loadAnalytics);
 
 
   /* =======================================================
