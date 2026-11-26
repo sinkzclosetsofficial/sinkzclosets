@@ -1,377 +1,234 @@
-
 /* =========================================================
-   SINKZCLOSETS — FIRST-PARTY WEBSITE ANALYTICS
-   Version: 1.0
-   Storage: Browser localStorage (temporary, pre-Supabase)
+   SINKZCLOSETS — FIRST-PARTY SHARED ANALYTICS
+   Events are stored centrally in Supabase, not browser-only.
    ========================================================= */
-
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "sinkz_analytics_events_v1";
-  const VISITOR_KEY = "sinkz_analytics_visitor_v1";
-  const SESSION_KEY = "sinkz_analytics_session_v1";
-  const MAX_EVENTS = 5000;
+  const SUPABASE_URL = "https://mpzkiatdejirrjidkdqi.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_9Lpund59NwZAcpZyiCdxPg_D8fohkXR";
+  const QUEUE_KEY = "sinkz_analytics_pending_v2";
+  const VISITOR_KEY = "sinkz_analytics_visitor_v2";
+  const SESSION_KEY = "sinkz_analytics_session_v2";
+  const MAX_QUEUE = 100;
+  let client = null;
 
-  // ---------------------------------------------------------
-  // 1. SAFE STORAGE
-  // ---------------------------------------------------------
-
-  function readStorage(key, fallback) {
-    try {
-      const value = localStorage.getItem(key);
-      return value ? JSON.parse(value) : fallback;
-    } catch (error) {
-      return fallback;
-    }
-  }
-
-  function writeStorage(key, value) {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-      return true;
-    } catch (error) {
-      console.warn("Sinkz Analytics: Storage unavailable.", error);
-      return false;
-    }
-  }
-
-  function createId() {
+  function uuid() {
     if (window.crypto && typeof window.crypto.randomUUID === "function") {
       return window.crypto.randomUUID();
     }
-
-    return (
-      Date.now().toString(36) +
-      Math.random().toString(36).slice(2) +
-      Math.random().toString(36).slice(2)
-    );
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      const r = Math.random() * 16 | 0;
+      return (c === "x" ? r : (r & 3 | 8)).toString(16);
+    });
   }
 
-  function getStoredId(key) {
+  function storedId(storage, key) {
     try {
-      let id = localStorage.getItem(key);
-
-      if (!id) {
-        id = createId();
-        localStorage.setItem(key, id);
+      let value = storage.getItem(key);
+      if (!value) {
+        value = uuid();
+        storage.setItem(key, value);
       }
-
-      return id;
-    } catch (error) {
-      return createId();
+      return value;
+    } catch (_) {
+      return uuid();
     }
   }
 
-  const visitorId = getStoredId(VISITOR_KEY);
+  const visitorId = storedId(localStorage, VISITOR_KEY);
+  const sessionId = storedId(sessionStorage, SESSION_KEY);
 
-  function getSessionId() {
+  function getClient() {
+    if (client) return client;
+    if (!window.supabase || typeof window.supabase.createClient !== "function") {
+      return null;
+    }
+    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+    });
+    return client;
+  }
+
+  function readQueue() {
     try {
-      let id = sessionStorage.getItem(SESSION_KEY);
-
-      if (!id) {
-        id = createId();
-        sessionStorage.setItem(SESSION_KEY, id);
-      }
-
-      return id;
-    } catch (error) {
-      return createId();
+      const value = JSON.parse(localStorage.getItem(QUEUE_KEY) || "[]");
+      return Array.isArray(value) ? value : [];
+    } catch (_) {
+      return [];
     }
   }
 
-  const sessionId = getSessionId();
-
-  // ---------------------------------------------------------
-  // 2. DEVICE INFORMATION
-  // ---------------------------------------------------------
-
-  function getDeviceType() {
-    const ua = navigator.userAgent || "";
-
-    if (/tablet|ipad/i.test(ua)) {
-      return "Tablet";
-    }
-
-    if (/mobile|android|iphone|ipod/i.test(ua)) {
-      return "Mobile";
-    }
-
-    return "Desktop";
+  function saveQueue(queue) {
+    try {
+      localStorage.setItem(QUEUE_KEY, JSON.stringify(queue.slice(-MAX_QUEUE)));
+    } catch (_) {}
   }
 
-  function getBrowserType() {
-    const ua = navigator.userAgent || "";
-
-    if (ua.includes("Edg/")) return "Edge";
-    if (ua.includes("Firefox/")) return "Firefox";
-    if (ua.includes("SamsungBrowser/")) return "Samsung Internet";
-    if (ua.includes("Chrome/")) return "Chrome";
-    if (ua.includes("Safari/")) return "Safari";
-
-    return "Other";
-  }
-
-  // ---------------------------------------------------------
-  // 3. PAGE INFORMATION
-  // ---------------------------------------------------------
-
-  function getPageType() {
-    const path = window.location.pathname.toLowerCase();
-
-    if (path.endsWith("index.html") || path.endsWith("/")) {
-      return "Homepage";
-    }
-
+  function pageType() {
+    const path = location.pathname.toLowerCase();
+    if (path === "/" || path.endsWith("/index.html")) return "Homepage";
     if (path.includes("shop")) return "Shop";
     if (path.includes("product")) return "Product";
     if (path.includes("cart")) return "Cart";
     if (path.includes("checkout")) return "Checkout";
     if (path.includes("about")) return "About";
-    if (path.includes("contact")) return "Contact";
     if (path.includes("privacy")) return "Privacy";
     if (path.includes("terms")) return "Terms";
-
     return "Other";
   }
 
-  function getPagePath() {
-    // Do not record query strings or URL fragments.
-    return window.location.pathname || "/";
+  function deviceType() {
+    const ua = navigator.userAgent || "";
+    if (/ipad|tablet/i.test(ua)) return "Tablet";
+    if (/mobile|android|iphone|ipod/i.test(ua)) return "Mobile";
+    return "Desktop";
   }
 
-  function getTrafficSource() {
-    const referrer = document.referrer;
+  function browserType() {
+    const ua = navigator.userAgent || "";
+    if (ua.includes("Edg/")) return "Edge";
+    if (ua.includes("Firefox/")) return "Firefox";
+    if (ua.includes("SamsungBrowser/")) return "Samsung Internet";
+    if (ua.includes("Chrome/")) return "Chrome";
+    if (ua.includes("Safari/")) return "Safari";
+    return "Other";
+  }
 
-    if (!referrer) {
-      return "Direct";
-    }
-
+  function trafficSource() {
+    if (!document.referrer) return "Direct";
     try {
-      const sourceHost = new URL(referrer).hostname;
-      const currentHost = window.location.hostname;
-
-      if (sourceHost === currentHost) {
-        return "Internal";
-      }
-
-      if (/google\./i.test(sourceHost)) return "Google";
-      if (/bing\./i.test(sourceHost)) return "Bing";
-      if (/facebook\./i.test(sourceHost)) return "Facebook";
-      if (/instagram\./i.test(sourceHost)) return "Instagram";
-      if (/tiktok\./i.test(sourceHost)) return "TikTok";
-      if (/whatsapp\./i.test(sourceHost)) return "WhatsApp";
-
-      return sourceHost.replace(/^www\./, "");
-    } catch (error) {
+      const host = new URL(document.referrer).hostname.toLowerCase();
+      if (host === location.hostname.toLowerCase()) return "Internal";
+      if (host.includes("google.")) return "Google";
+      if (host.includes("bing.")) return "Bing";
+      if (host.includes("facebook.")) return "Facebook";
+      if (host.includes("instagram.")) return "Instagram";
+      if (host.includes("tiktok.")) return "TikTok";
+      if (host.includes("whatsapp.")) return "WhatsApp";
+      return host.replace(/^www\./, "").slice(0, 150);
+    } catch (_) {
       return "Other";
     }
   }
 
-  // ---------------------------------------------------------
-  // 4. EVENT STORAGE
-  // ---------------------------------------------------------
-
-  function getEvents() {
-    const events = readStorage(STORAGE_KEY, []);
-    return Array.isArray(events) ? events : [];
+  function clean(value, max) {
+    return typeof value === "string" ? value.trim().slice(0, max) : "";
   }
 
-  function track(eventName, details) {
-    if (!eventName || typeof eventName !== "string") {
-      return;
+  async function send(row) {
+    const db = getClient();
+    if (!db) throw new Error("Supabase analytics client is unavailable.");
+    const result = await db.from("analytics_events").insert(row);
+    if (result.error) throw result.error;
+  }
+
+  async function flushQueue() {
+    const queue = readQueue();
+    if (!queue.length || !getClient()) return;
+    const remaining = [];
+    for (const row of queue) {
+      try {
+        await send(row);
+      } catch (error) {
+        remaining.push(row);
+      }
     }
+    saveQueue(remaining);
+  }
 
-    const safeDetails = details && typeof details === "object"
-      ? details
-      : {};
-
-    const event = {
-      id: createId(),
-      event: eventName,
-      timestamp: new Date().toISOString(),
+  function track(name, details) {
+    const allowed = ["page_view", "product_view", "add_to_cart", "checkout_visit"];
+    const eventName = allowed.includes(name) ? name : "custom";
+    const info = details && typeof details === "object" ? details : {};
+    const row = {
+      event_id: uuid(),
+      event_name: eventName,
+      occurred_at: new Date().toISOString(),
       visitor_id: visitorId,
       session_id: sessionId,
-      page: getPagePath(),
-      page_type: getPageType(),
-      device: getDeviceType(),
-      browser: getBrowserType(),
-      source: getTrafficSource()
+      page_path: clean(location.pathname || "/", 500) || "/",
+      page_type: pageType(),
+      device: deviceType(),
+      browser: clean(browserType(), 60),
+      traffic_source: clean(trafficSource(), 150),
+      product_id: clean(String(info.product_id || ""), 100) || null,
+      product_name: clean(String(info.product_name || ""), 150) || null,
+      category: clean(String(info.category || ""), 100) || null
     };
 
-    // Only accept selected, non-sensitive event details.
-    if (typeof safeDetails.product_id === "string" ||
-        typeof safeDetails.product_id === "number") {
-      event.product_id = String(safeDetails.product_id).slice(0, 100);
-    }
-
-    if (typeof safeDetails.product_name === "string") {
-      event.product_name = safeDetails.product_name.slice(0, 150);
-    }
-
-    if (typeof safeDetails.category === "string") {
-      event.category = safeDetails.category.slice(0, 100);
-    }
-
-    const events = getEvents();
-    events.push(event);
-
-    // Keep storage within a reasonable limit.
-    const trimmedEvents = events.slice(-MAX_EVENTS);
-
-    writeStorage(STORAGE_KEY, trimmedEvents);
-
-    window.dispatchEvent(
-      new CustomEvent("sinkz:analytics-event", {
-        detail: { event: eventName }
-      })
-    );
+    send(row).catch(function (error) {
+      const queue = readQueue();
+      queue.push(row);
+      saveQueue(queue);
+      console.warn("SINKZCLOSETS analytics event queued:", error.message || error);
+    });
   }
 
-  // ---------------------------------------------------------
-  // 5. PAGE VIEW TRACKING
-  // ---------------------------------------------------------
-
-  function shouldIgnorePage() {
-    const path = getPagePath().toLowerCase();
-
-    return (
-      path.includes("analytics.html") ||
-      path.includes("admin.html") ||
-      path.includes("/admin/")
-    );
+  function shouldTrackPage() {
+    const path = location.pathname.toLowerCase();
+    return !path.includes("admin.html") && !path.includes("analytics.html");
   }
 
-  function trackPageView() {
-    if (shouldIgnorePage()) return;
-
+  function trackPage() {
+    if (!shouldTrackPage()) return;
     track("page_view");
 
-    // Track product views when product details are available.
-    const productNameElement = document.getElementById("productName");
-    const productId = new URLSearchParams(
-      window.location.search
-    ).get("id");
+    if (pageType() === "Checkout") track("checkout_visit");
 
-    if (productNameElement) {
-      const productName = productNameElement.textContent.trim();
-
+    if (pageType() === "Product") {
+      const name = document.getElementById("productName");
+      const category = document.getElementById("productCategory");
+      const id = new URLSearchParams(location.search).get("id") || "";
+      const productName = name ? clean(name.textContent, 150) : "";
       if (productName && productName !== "Product not found") {
-        const categoryElement = document.getElementById("productCategory");
-
         track("product_view", {
-          product_id: productId || "",
+          product_id: id,
           product_name: productName,
-          category: categoryElement
-            ? categoryElement.textContent.trim()
-            : ""
+          category: category ? clean(category.textContent, 100) : ""
         });
       }
     }
   }
 
-  // ---------------------------------------------------------
-  // 6. SHOPPING ACTIVITY TRACKING
-  // ---------------------------------------------------------
-
   document.addEventListener("click", function (event) {
     const target = event.target;
-
     if (!(target instanceof Element)) return;
+    const control = target.closest("button, a, [role='button'], [data-analytics-event]");
+    if (!control) return;
 
-    const button = target.closest(
-      "button, a, [role='button'], [data-analytics-event]"
-    );
+    const custom = control.getAttribute("data-analytics-event");
+    if (custom) track("custom", { category: clean(custom, 100) });
 
-    if (!button) return;
-
-    // Custom event labels can be added to HTML elements.
-    const customEvent = button.getAttribute("data-analytics-event");
-
-    if (customEvent) {
-      track(customEvent);
-    }
-
-    const buttonText = (
-      button.textContent || ""
-    ).trim().toLowerCase();
-
-    const elementId = (button.id || "").toLowerCase();
-    const elementClass = (
-      typeof button.className === "string"
-        ? button.className
-        : ""
-    ).toLowerCase();
-
-    const isAddToCart =
-      elementId.includes("addtocart") ||
-      elementClass.includes("add-to-cart") ||
-      buttonText.includes("add to cart");
-
-    if (isAddToCart) {
-      const productId =
-        button.getAttribute("data-product-id") || "";
-
-      const productName =
-        button.getAttribute("data-product-name") || "";
-
+    const id = (control.id || "").toLowerCase();
+    const classes = typeof control.className === "string" ? control.className.toLowerCase() : "";
+    const label = (control.textContent || "").trim().toLowerCase();
+    const addToCart = id.includes("addtocart") || classes.includes("add-to-cart") ||
+      label.includes("add to cart");
+    if (addToCart) {
       track("add_to_cart", {
-        product_id: productId,
-        product_name: productName
+        product_id: control.getAttribute("data-product-id") || "",
+        product_name: control.getAttribute("data-product-name") || ""
       });
     }
-
-    const link = button.closest("a");
-    const href = link ? link.getAttribute("href") : "";
-
-    if (
-      href &&
-      /checkout\.html/i.test(href)
-    ) {
-      track("checkout_visit");
-    }
-  });
-
-  // ---------------------------------------------------------
-  // 7. CUSTOM EVENTS
-  // ---------------------------------------------------------
-
-  window.addEventListener("sinkz:analytics", function (event) {
-    if (!event.detail || !event.detail.name) return;
-
-    track(event.detail.name, event.detail.data || {});
-  });
-
-  // ---------------------------------------------------------
-  // 8. PUBLIC ANALYTICS API
-  // ---------------------------------------------------------
+  }, true);
 
   window.SinkzAnalytics = {
     track: track,
-
-    getEvents: getEvents,
-
-    getVisitorId: function () {
-      return visitorId;
-    },
-
-    getSessionId: function () {
-      return sessionId;
-    },
-
-    getDeviceType: getDeviceType,
-
-    version: "1.0"
+    getVisitorId: function () { return visitorId; },
+    getSessionId: function () { return sessionId; },
+    flush: flushQueue,
+    version: "2.0"
   };
 
-  // ---------------------------------------------------------
-  // 9. START TRACKING
-  // ---------------------------------------------------------
-
+  window.addEventListener("online", flushQueue);
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", trackPageView);
+    document.addEventListener("DOMContentLoaded", function () {
+      trackPage();
+      flushQueue();
+    }, { once: true });
   } else {
-    trackPageView();
+    trackPage();
+    flushQueue();
   }
-
 })();
