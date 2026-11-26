@@ -18,6 +18,12 @@
         const form = document.getElementById("checkoutForm");
         const itemsContainer = document.getElementById("checkoutItems");
         const totalElement = document.getElementById("checkoutTotal");
+        const subtotalElement = document.getElementById("checkoutSubtotal");
+        const discountRow = document.getElementById("checkoutDiscountRow");
+        const discountAmountElement = document.getElementById("checkoutDiscountAmount");
+        const discountInput = document.getElementById("discountCodeInput");
+        const applyDiscountButton = document.getElementById("applyDiscountButton");
+        const discountMessage = document.getElementById("discountCodeMessage");
         const currencyElement = document.getElementById("checkoutCurrency");
         const emptyMessage = document.getElementById("checkoutEmpty");
         const content = document.getElementById("checkoutContent");
@@ -75,6 +81,8 @@
         let currentCurrency = "ZMW";
         let currentTotal = 0;
         let checkoutProblems = [];
+        let appliedDiscount = null;
+        let discountValidationInProgress = false;
 
         function getCurrency() {
             const currency = store.getCurrency();
@@ -304,7 +312,17 @@
                 itemsContainer.appendChild(row);
             });
 
-            totalElement.textContent = formatPrice(currentTotal);
+            if (subtotalElement) subtotalElement.textContent = formatPrice(currentTotal);
+            if (appliedDiscount && appliedDiscount.currency === currentCurrency) {
+                const safeDiscount = Math.min(appliedDiscount.amount, currentTotal);
+                if (discountRow) discountRow.hidden = false;
+                if (discountAmountElement) discountAmountElement.textContent = "−" + formatPrice(safeDiscount);
+                totalElement.textContent = formatPrice(Math.max(0, currentTotal - safeDiscount));
+            } else {
+                appliedDiscount = null;
+                if (discountRow) discountRow.hidden = true;
+                totalElement.textContent = formatPrice(currentTotal);
+            }
 
             checkoutProblems = validateCart(currentCart);
             showWarning(checkoutProblems);
@@ -526,6 +544,122 @@
             return "Not selected";
         }
 
+        function setDiscountMessage(message, isError) {
+            if (!discountMessage) return;
+            discountMessage.textContent = message || "";
+            discountMessage.style.color = isError ? "#b42318" : "#167647";
+        }
+
+        async function validateDiscountCode(code, cart) {
+            const client = window.supabase && typeof window.supabase.createClient === "function"
+                ? window.supabase.createClient(
+                    "https://mpzkiatdejirrjidkdqi.supabase.co",
+                    "sb_publishable_9Lpund59NwZAcpZyiCdxPg_D8fohkXR"
+                  )
+                : null;
+
+            if (!client) throw new Error("Discount validation is unavailable. Please try again later.");
+
+            const items = (cart || []).map(function (item) {
+                return {
+                    product_id: String(item.id || ""),
+                    quantity: Number(item.quantity)
+                };
+            });
+
+            const { data, error } = await client.rpc("validate_discount_code", {
+                p_code: code,
+                p_currency: currentCurrency,
+                p_items: items
+            });
+
+            if (error) throw error;
+            const result = Array.isArray(data) ? data[0] : data;
+            if (!result) throw new Error("The discount service returned no validation result.");
+            return result;
+        }
+
+        async function applyDiscount() {
+            if (discountValidationInProgress) return;
+            const code = (discountInput?.value || "").trim().toUpperCase();
+            if (!code) {
+                appliedDiscount = null;
+                setDiscountMessage("Enter a discount code first.", true);
+                renderOrder();
+                return;
+            }
+            if (!currentCart.length) {
+                setDiscountMessage("Add products to your cart before applying a discount.", true);
+                return;
+            }
+
+            discountValidationInProgress = true;
+            if (applyDiscountButton) {
+                applyDiscountButton.disabled = true;
+                applyDiscountButton.textContent = "Checking…";
+            }
+
+            try {
+                const result = await validateDiscountCode(code, currentCart);
+                if (!result.valid) {
+                    appliedDiscount = null;
+                    renderOrder();
+                    setDiscountMessage(result.message || "This discount code cannot be applied.", true);
+                    return;
+                }
+
+                const amount = Number(result.discount_amount);
+                if (!Number.isFinite(amount) || amount <= 0) {
+                    appliedDiscount = null;
+                    renderOrder();
+                    setDiscountMessage("This discount does not reduce the current order total.", true);
+                    return;
+                }
+
+                appliedDiscount = {
+                    code: result.normalized_code || code,
+                    name: result.campaign_name || "Promotion",
+                    amount: Math.min(amount, Number(result.subtotal) || currentTotal),
+                    currency: currentCurrency
+                };
+                renderOrder();
+                setDiscountMessage(
+                    (result.campaign_name || "Promotion") + " applied. Savings: " +
+                    formatPrice(appliedDiscount.amount) + ". The shop will confirm the final order amount.",
+                    false
+                );
+            } catch (error) {
+                appliedDiscount = null;
+                renderOrder();
+                setDiscountMessage(error.message || "Discount validation failed. Please try again.", true);
+            } finally {
+                discountValidationInProgress = false;
+                if (applyDiscountButton) {
+                    applyDiscountButton.disabled = false;
+                    applyDiscountButton.textContent = "Apply";
+                }
+            }
+        }
+
+        if (applyDiscountButton) {
+            applyDiscountButton.addEventListener("click", applyDiscount);
+        }
+        if (discountInput) {
+            discountInput.addEventListener("keydown", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    applyDiscount();
+                }
+            });
+            discountInput.addEventListener("input", function () {
+                if (appliedDiscount && discountInput.value.trim().toUpperCase() !== appliedDiscount.code) {
+                    appliedDiscount = null;
+                    setDiscountMessage("Apply the edited code to validate it.", false);
+                    renderOrder();
+                }
+            });
+        }
+
         function createWhatsAppMessage(customer, cart, total) {
             let message = "SINKZCLOSETS — ORDER ENQUIRY\n\n";
 
@@ -546,7 +680,16 @@
             });
 
             message += "\nCurrency: " + currentCurrency + "\n";
-            message += "Order total: " + formatPrice(total) + "\n";
+            if (appliedDiscount && appliedDiscount.currency === currentCurrency) {
+                message += "Discount code: " + appliedDiscount.code + "\n";
+                message += "Promotion: " + appliedDiscount.name + "\n";
+                message += "Discount: -" + formatPrice(appliedDiscount.amount) + "\n";
+                message += "Subtotal: " + formatPrice(total) + "\n";
+                message += "Order total after discount: " + formatPrice(Math.max(0, total - appliedDiscount.amount)) + "\n";
+                message += "Discount is subject to final store verification.\n";
+            } else {
+                message += "Order total: " + formatPrice(total) + "\n";
+            }
             message += "Payment method: " + getPaymentDescription(customer) + "\n";
             message += "Payment reference: " + (customer.reference || "Not supplied") + "\n";
             message += "Additional notes: " + (customer.notes || "None") + "\n\n";
@@ -559,7 +702,7 @@
             return message;
         }
 
-        form.addEventListener("submit", function (event) {
+        form.addEventListener("submit", async function (event) {
             event.preventDefault();
 
             renderOrder();
@@ -612,6 +755,37 @@
                 return sum + (Number(item.price) * Number(item.quantity));
             }, 0);
 
+            // Revalidate on submission so an expired, paused or edited
+            // campaign cannot rely on an earlier browser-side result.
+            if (appliedDiscount) {
+                try {
+                    const finalCheck = await validateDiscountCode(appliedDiscount.code, latestCart);
+                    if (!finalCheck.valid) {
+                        appliedDiscount = null;
+                        renderOrder();
+                        setDiscountMessage(finalCheck.message || "The discount is no longer valid. Review your order total.", true);
+                        return;
+                    }
+                    appliedDiscount = {
+                        code: finalCheck.normalized_code || appliedDiscount.code,
+                        name: finalCheck.campaign_name || appliedDiscount.name,
+                        amount: Math.min(Number(finalCheck.discount_amount) || 0, latestTotal),
+                        currency: currentCurrency
+                    };
+                    if (appliedDiscount.amount <= 0) {
+                        appliedDiscount = null;
+                        renderOrder();
+                        setDiscountMessage("The discount no longer applies to this order.", true);
+                        return;
+                    }
+                    renderOrder();
+                } catch (error) {
+                    setDiscountMessage("We could not recheck the discount. Please try applying it again before submitting.", true);
+                    return;
+                }
+            }
+
+            const finalTotal = Math.max(0, latestTotal - (appliedDiscount ? appliedDiscount.amount : 0));
             const message = createWhatsAppMessage(
                 customer,
                 latestCart,
