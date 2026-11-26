@@ -715,6 +715,15 @@
             return false;
         }
 
+        // Record only after the cart save succeeds.
+        if (window.SinkzAnalytics && typeof window.SinkzAnalytics.track === "function") {
+            window.SinkzAnalytics.track("add_to_cart", {
+                product_id: String(product.id),
+                product_name: String(product.name || ""),
+                category: String(product.category || "")
+            });
+        }
+
         openCartDrawer();
 
         return true;
