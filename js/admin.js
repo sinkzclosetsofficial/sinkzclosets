@@ -667,6 +667,20 @@ document.addEventListener("DOMContentLoaded", () => {
      ======================================================= */
 
   async function restoreSession() {
+    // A recovery link establishes a temporary recovery session. Do not let
+    // normal dashboard session restoration race the PASSWORD_RECOVERY event
+    // and hide the password form before the user can set a new password.
+    const recoveryQuery = new URLSearchParams(window.location.search);
+    const recoveryHash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const recoveryRequested =
+      recoveryQuery.get("password-recovery") === "1" ||
+      recoveryHash.get("type") === "recovery";
+
+    if (recoveryRequested) {
+      showLogin();
+      return;
+    }
+
     try {
       const {
         data: { session },
