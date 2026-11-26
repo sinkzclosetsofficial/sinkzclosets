@@ -1272,6 +1272,7 @@ html[data-theme="light"] .login-card { background: #ffffff; }
         <button class="admin-nav-item" data-section="customersSection">♙ <span>Customers</span></button>
         <button class="admin-nav-item" data-section="reviewsSection">☆ <span>Reviews</span></button>
         <button class="admin-nav-item" data-section="announcementsSection">▤ <span>Announcements</span></button>
+        <button class="admin-nav-item" data-section="contactPaymentsSection">☎ <span>Contacts & Payments</span></button>
         <button class="admin-nav-item" data-section="storefrontSection">⌂ <span>Storefront</span></button>
         <button class="admin-nav-item" data-section="settingsSection">⚙ <span>Settings</span></button>
         <button class="admin-nav-item" data-section="securitySection">⌑ <span>Cyber Security</span></button>
@@ -1866,6 +1867,76 @@ html[data-theme="light"] .login-card { background: #ffffff; }
 
 
         <!-- 14. STOREFRONT -->
+
+        <!-- BUSINESS CONTACT AND PAYMENT MANAGEMENT -->
+        <section id="contactPaymentsSection" class="admin-section" hidden>
+          <div class="section-heading">
+            <h2>Contact & Payment Management</h2>
+            <span>Add, edit, deactivate, reactivate or permanently delete public contact and payment details.</span>
+          </div>
+          <section class="admin-panel">
+            <h3 id="contactPaymentFormTitle">Add a contact or payment number</h3>
+            <form id="businessContactPaymentForm" class="admin-form-grid">
+              <input id="contactPaymentId" type="hidden">
+              <div>
+                <label for="contactPaymentType">Record type</label>
+                <select id="contactPaymentType" required>
+                  <option value="payment">Payment number</option>
+                  <option value="whatsapp">WhatsApp / customer service</option>
+                  <option value="phone">Call number</option>
+                  <option value="email">Email contact</option>
+                </select>
+              </div>
+              <div>
+                <label for="contactPaymentProvider">Provider / channel</label>
+                <select id="contactPaymentProvider" required>
+                  <option value="mtn">MTN</option>
+                  <option value="airtel">Airtel</option>
+                  <option value="capitec">Capitec</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label for="contactPaymentLabel">Display label</label>
+                <input id="contactPaymentLabel" maxlength="80" required placeholder="e.g. Airtel Money">
+              </div>
+              <div>
+                <label for="contactPaymentNumber">Phone number</label>
+                <input id="contactPaymentNumber" inputmode="tel" placeholder="e.g. 097315929">
+              </div>
+              <div>
+                <label for="contactPaymentEmail">Email address</label>
+                <input id="contactPaymentEmail" type="email" placeholder="name@example.com">
+              </div>
+              <div>
+                <label for="contactPaymentRecipient">Payment recipient name (optional)</label>
+                <input id="contactPaymentRecipient" maxlength="120">
+              </div>
+              <div>
+                <label for="contactPaymentAppUrl">App / contact URL (optional)</label>
+                <input id="contactPaymentAppUrl" type="url" placeholder="https://...">
+              </div>
+              <div>
+                <label for="contactPaymentOrder">Display order</label>
+                <input id="contactPaymentOrder" type="number" min="0" step="1" value="100">
+              </div>
+              <div class="form-span-two" style="display:flex;gap:10px;flex-wrap:wrap">
+                <button type="submit" class="primary-button" id="saveContactPayment">Save record</button>
+                <button type="button" class="secondary-button" id="cancelContactPaymentEdit">Clear form</button>
+              </div>
+              <p id="contactPaymentMessage" class="form-message form-span-two" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+          <section class="admin-panel">
+            <div class="section-heading">
+              <h3>Saved public details</h3>
+              <button type="button" class="secondary-button" id="refreshContactPayments">Refresh records</button>
+            </div>
+            <div id="businessContactPaymentList"><p class="empty-message">Open this section to load records.</p></div>
+          </section>
+          <p class="muted">Changes affect current public contact and checkout details. Existing orders retain the payment details recorded at the time of ordering. Deactivation hides a record without erasing its history.</p>
+        </section>
+
         <section id="storefrontSection" class="admin-section" hidden>
           <div class="section-heading">
             <h2>Storefront settings</h2>
