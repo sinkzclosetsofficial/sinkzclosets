@@ -328,6 +328,37 @@
             line-height: 1.6;
         }
 
+        /* Three compact, clickable payment-brand icons in one horizontal row. */
+        .sinkz-payment-grid.sinkz-payment-icons {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            max-width: 620px;
+            margin: 26px auto 0;
+        }
+
+        .sinkz-payment-icon-link {
+            min-width: 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 10px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .sinkz-payment-icon-link:hover,
+        .sinkz-payment-icon-link:focus-visible {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(27, 36, 50, .12);
+        }
+
+        .sinkz-payment-icon-link .sinkz-payment-logo {
+            margin: 0;
+        }
+
         .sinkz-payment-note {
             max-width: 760px;
             margin: 22px auto 0;
@@ -406,8 +437,23 @@
                 gap: 18px;
             }
 
-            .sinkz-payment-grid {
+            .sinkz-payment-grid:not(.sinkz-payment-icons) {
                 grid-template-columns: 1fr;
+            }
+
+            .sinkz-payment-grid.sinkz-payment-icons {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 9px;
+            }
+
+            .sinkz-payment-grid.sinkz-payment-icons .sinkz-payment-card {
+                min-height: 82px;
+                padding: 12px 5px;
+            }
+
+            .sinkz-payment-grid.sinkz-payment-icons .sinkz-payment-logo {
+                max-width: 100%;
+                font-size: clamp(12px, 3.4vw, 20px);
             }
         }
 
@@ -1288,109 +1334,31 @@
 
     <div class="sinkz-payment-heading">
         <p>CONVENIENT PAYMENT OPTIONS</p>
-        <h2>Our Payment Methods</h2>
-        <span>Choose your preferred payment service.</span>
+        <h2>You can pay through Airtel, MTN and Capitec</h2>
     </div>
 
-    <div class="sinkz-payment-grid">
+    <div class="sinkz-payment-grid sinkz-payment-icons">
 
-        <!-- MTN MOBILE MONEY -->
-        <article class="sinkz-payment-card">
+        <a class="sinkz-payment-card sinkz-payment-icon-link"
+           href="https://airtelafricaone.page.link"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Open Airtel Money app" title="Airtel Money">
+            <span class="sinkz-payment-logo sinkz-airtel" aria-hidden="true">airtel</span>
+        </a>
 
-            <div class="sinkz-payment-logo sinkz-mtn">
-                MTN
-            </div>
+        <a class="sinkz-payment-card sinkz-payment-icon-link"
+           href="https://appbiz.momo.africa"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Open MTN Mobile Money app" title="MTN Mobile Money">
+            <span class="sinkz-payment-logo sinkz-mtn" aria-hidden="true">MTN</span>
+        </a>
 
-            <h3>MTN Mobile Money</h3>
-
-            <p>
-                Pay conveniently using MTN Mobile Money.
-            </p>
-
-            <p><strong>Payment number:</strong> 0765633293</p>
-            <p><strong>Account name:</strong> Patricia Zungu</p>
-
-            <a
-                href="https://appbiz.momo.africa"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Open MTN MoMo App
-            </a>
-
-            <a
-                class="sinkz-provider-link"
-                href="https://www.mtn.zm/momo/"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Visit MTN Zambia
-            </a>
-
-        </article>
-
-        <!-- AIRTEL MONEY -->
-        <article class="sinkz-payment-card">
-
-            <div class="sinkz-payment-logo sinkz-airtel">
-                airtel
-            </div>
-
-            <h3>Airtel Money</h3>
-
-            
-            <a
-                class="sinkz-provider-link"
-                href="https://airtelafricaone.page.link"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Open Airtel Money App
-            </a>
-
-            <a
-                class="sinkz-provider-link"
-                href="https://www.airtel.co.zm/"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Visit Airtel Zambia
-            </a>
-
-        </article>
-
-        <!-- CAPITEC BANK -->
-        <article class="sinkz-payment-card">
-
-            <div class="sinkz-payment-logo sinkz-capitec">
-                CAPITEC
-            </div>
-
-            <h3>Capitec Bank</h3>
-
-            <p>
-                South African banking option for customers who already use Capitec.
-                Confirm cross-border transfer availability and charges with your bank.
-            </p>
-
-            <a
-                href="https://www.capitecbank.co.za/personal/transact/cellphone-app/"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Get Capitec App
-            </a>
-
-            <a
-                class="sinkz-provider-link"
-                href="https://www.capitecbank.co.za/"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Visit Capitec
-            </a>
-
-        </article>
+        <a class="sinkz-payment-card sinkz-payment-icon-link"
+           href="https://www.capitecbank.co.za/personal/transact/cellphone-app/"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Open Capitec banking app information" title="Capitec">
+            <span class="sinkz-payment-logo sinkz-capitec" aria-hidden="true">CAPITEC</span>
+        </a>
 
     </div>
 
