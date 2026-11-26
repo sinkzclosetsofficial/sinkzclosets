@@ -714,6 +714,8 @@ document.addEventListener("DOMContentLoaded", () => {
       loadAnalytics();
     }
 
+    if (sectionId === "discountsSection") loadDiscountCampaigns();
+
     if (
       sectionId === "ordersSection" ||
       sectionId === "paymentsSection" ||
@@ -2099,7 +2101,145 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =======================================================
-     25. ACCOUNT EMAIL CHANGE
+     25. DISCOUNT CAMPAIGNS
+     ======================================================= */
+
+  let discountCampaigns = [];
+
+  function discountLocalDate(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 16);
+  }
+
+  function fillDiscountScopeOptions() {
+    const category = $("discountCategory");
+    const product = $("discountProduct");
+    if (category) {
+      const selected = category.value;
+      category.innerHTML = '<option value="">Choose category</option>' + categories.filter(item => item.status === "active").map(item => '<option value="' + escapeHTML(item.name) + '">' + escapeHTML(item.name) + '</option>').join("");
+      category.value = selected;
+    }
+    if (product) {
+      const selected = product.value;
+      product.innerHTML = '<option value="">Choose product</option>' + products.filter(item => item.status === "active").map(item => '<option value="' + escapeHTML(item.id) + '">' + escapeHTML(item.name) + '</option>').join("");
+      product.value = selected;
+    }
+  }
+
+  function updateDiscountScopeFields() {
+    const scope = $("discountScope")?.value || "all";
+    if ($("discountCategoryWrap")) $("discountCategoryWrap").hidden = scope !== "category";
+    if ($("discountProductWrap")) $("discountProductWrap").hidden = scope !== "product";
+  }
+
+  function clearDiscountForm() {
+    $("discountCampaignForm")?.reset();
+    setValue("discountEditId", "");
+    setText("discountFormHeading", "Create discount campaign");
+    setText("saveDiscountButton", "Save campaign");
+    setValue("discountMinimum", "0");
+    setValue("discountActive", "true");
+    updateDiscountScopeFields();
+    showMessage("discountMessage", "");
+  }
+
+  async function loadDiscountCampaigns() {
+    const host = $("discountCampaignList");
+    if (host) host.innerHTML = '<p class="empty-message">Loading discount campaigns...</p>';
+    fillDiscountScopeOptions();
+    const { data, error } = await db.from("discount_campaigns").select("*").order("created_at", { ascending: false });
+    if (error) {
+      console.error("Discount campaigns loading error:", error);
+      if (host) host.textContent = "Campaigns could not be loaded: " + error.message;
+      showMessage("discountMessage", error.message, "error");
+      return;
+    }
+    discountCampaigns = data || [];
+    renderDiscountCampaigns();
+  }
+
+  function renderDiscountCampaigns() {
+    const host = $("discountCampaignList");
+    if (!host) return;
+    if (!discountCampaigns.length) { host.innerHTML = '<p class="empty-message">No discount campaigns yet. Create your first campaign above.</p>'; return; }
+    const rows = discountCampaigns.map(item => {
+      const now = Date.now();
+      const state = !item.is_active ? "Paused" : (now < new Date(item.starts_at).getTime() ? "Scheduled" : (now > new Date(item.ends_at).getTime() ? "Expired" : "Active"));
+      const offer = item.discount_type === "percentage" ? Number(item.discount_value) + "%" : formatMoney(item.discount_value, item.currency);
+      return '<tr><td>' + escapeHTML(item.name) + '<br><small>' + escapeHTML(item.description || "") + '</small></td><td><strong>' + escapeHTML(item.code) + '</strong></td><td>' + escapeHTML(offer) + '<br><small>' + escapeHTML(item.currency) + '</small></td><td>' + escapeHTML(formatAnalyticsTime(item.starts_at)) + '<br>to ' + escapeHTML(formatAnalyticsTime(item.ends_at)) + '</td><td>' + escapeHTML(state) + '</td><td><button type="button" data-edit-discount="' + escapeHTML(item.id) + '">Edit</button> <button type="button" data-toggle-discount="' + escapeHTML(item.id) + '">' + (item.is_active ? "Pause" : "Activate") + '</button> <button type="button" data-delete-discount="' + escapeHTML(item.id) + '">Delete</button></td></tr>';
+    }).join("");
+    host.innerHTML = '<div class="table-container"><table class="admin-table"><thead><tr><th>Campaign</th><th>Code</th><th>Offer</th><th>Period</th><th>Status</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
+  $("discountScope")?.addEventListener("change", updateDiscountScopeFields);
+  $("cancelDiscountEdit")?.addEventListener("click", clearDiscountForm);
+
+  $("discountCampaignForm")?.addEventListener("submit", async event => {
+    event.preventDefault();
+    const id = $("discountEditId").value;
+    const name = $("discountName").value.trim();
+    const code = $("discountCode").value.trim().toUpperCase();
+    const type = $("discountType").value;
+    const value = Number($("discountValue").value);
+    const currency = $("discountCurrency").value;
+    const max = $("discountMax").value === "" ? null : Number($("discountMax").value);
+    const minimum = Number($("discountMinimum").value || 0);
+    const scope = $("discountScope").value;
+    const starts = new Date($("discountStarts").value);
+    const ends = new Date($("discountEnds").value);
+    if (!/^[A-Z0-9_-]{3,40}$/.test(code)) { showMessage("discountMessage", "Use 3-40 letters, numbers, hyphens or underscores for the code.", "error"); return; }
+    if (!Number.isFinite(value) || value <= 0 || (type === "percentage" && value > 100)) { showMessage("discountMessage", "Enter a valid value. Percentages cannot exceed 100%.", "error"); return; }
+    if (max !== null && (!Number.isFinite(max) || max <= 0)) { showMessage("discountMessage", "Maximum discount must be greater than zero.", "error"); return; }
+    if (!Number.isFinite(minimum) || minimum < 0 || !Number.isFinite(starts.getTime()) || !Number.isFinite(ends.getTime()) || ends <= starts) { showMessage("discountMessage", "Check the minimum subtotal and campaign dates.", "error"); return; }
+    const category = scope === "category" ? $("discountCategory").value : null;
+    const productId = scope === "product" ? $("discountProduct").value : null;
+    if ((scope === "category" && !category) || (scope === "product" && !productId)) { showMessage("discountMessage", "Select the category or product for this campaign.", "error"); return; }
+    const payload = { name, code, description: $("discountDescription").value.trim(), discount_type: type, discount_value: value, currency, max_discount: max, min_subtotal: minimum, scope, category, product_id: productId, starts_at: starts.toISOString(), ends_at: ends.toISOString(), is_active: $("discountActive").value === "true", created_by: currentUser?.id || null, updated_at: new Date().toISOString() };
+    const button = $("saveDiscountButton"); button.disabled = true;
+    try {
+      const result = id ? await db.from("discount_campaigns").update(payload).eq("id", id) : await db.from("discount_campaigns").insert(payload);
+      if (result.error) throw result.error;
+      showMessage("discountMessage", "Discount campaign saved.", "success");
+      clearDiscountForm(); await loadDiscountCampaigns();
+    } catch (error) { console.error("Discount save error:", error); showMessage("discountMessage", error.message || "Campaign could not be saved.", "error"); }
+    finally { button.disabled = false; }
+  });
+
+  $("discountCampaignList")?.addEventListener("click", async event => {
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target) return;
+    const edit = target.closest("[data-edit-discount]");
+    const toggle = target.closest("[data-toggle-discount]");
+    const remove = target.closest("[data-delete-discount]");
+    const id = edit?.dataset.editDiscount || toggle?.dataset.toggleDiscount || remove?.dataset.deleteDiscount;
+    const item = discountCampaigns.find(row => row.id === id);
+    if (!item) return;
+    if (edit) {
+      fillDiscountScopeOptions(); setValue("discountEditId", item.id);
+      setText("discountFormHeading", "Edit discount campaign"); setText("saveDiscountButton", "Update campaign");
+      setValue("discountName", item.name); setValue("discountCode", item.code); setValue("discountDescription", item.description);
+      setValue("discountType", item.discount_type); setValue("discountValue", item.discount_value); setValue("discountCurrency", item.currency);
+      setValue("discountMax", item.max_discount ?? ""); setValue("discountMinimum", item.min_subtotal); setValue("discountScope", item.scope);
+      setValue("discountCategory", item.category || ""); setValue("discountProduct", item.product_id || "");
+      setValue("discountStarts", discountLocalDate(item.starts_at)); setValue("discountEnds", discountLocalDate(item.ends_at));
+      setValue("discountActive", String(item.is_active)); updateDiscountScopeFields();
+      $("discountCampaignForm")?.scrollIntoView({behavior:"smooth",block:"start"}); return;
+    }
+    if (toggle) {
+      const { error } = await db.from("discount_campaigns").update({is_active:!item.is_active,updated_at:new Date().toISOString()}).eq("id",item.id);
+      if (error) showMessage("discountMessage",error.message,"error"); else await loadDiscountCampaigns(); return;
+    }
+    if (remove && confirm("Permanently delete discount code " + item.code + "?")) {
+      const { error } = await db.from("discount_campaigns").delete().eq("id",item.id);
+      if (error) showMessage("discountMessage",error.message,"error"); else await loadDiscountCampaigns();
+    }
+  });
+
+
+  /* =======================================================
+     26. ACCOUNT EMAIL CHANGE
      ======================================================= */
 
   $("changeAdminEmailButton")?.addEventListener("click", async () => {
