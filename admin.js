@@ -2060,34 +2060,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      let query = db
-        .from("analytics_events")
-        .select("event_id,event_name,occurred_at,visitor_id,session_id,page_path,device,product_id,product_name")
-        .order("occurred_at", { ascending: false })
-        .limit(5000);
-
       const start = analyticsPeriodStart();
-      if (start) query = query.gte("occurred_at", start);
-
-      const { data, error } = await query;
+      const { data, error } = await db.rpc("get_analytics_report", {
+        p_since: start
+      });
       if (error) throw error;
 
-      const events = Array.isArray(data) ? data : [];
-      const pageViews = events.filter(row => row.event_name === "page_view");
-      const productViews = events.filter(row => row.event_name === "product_view");
-      const cartEvents = events.filter(row => row.event_name === "add_to_cart");
-      const checkoutEvents = events.filter(row => row.event_name === "checkout_visit");
+      const report = data || {};
+      const metrics = report.metrics || {};
+      const recent = Array.isArray(report.recent_events) ? report.recent_events : [];
 
-      setText("analyticsPageViews", pageViews.length.toLocaleString());
-      setText("analyticsVisitors", analyticsCountUnique(pageViews, "visitor_id").toLocaleString());
-      setText("analyticsProductViews", productViews.length.toLocaleString());
-      setText("analyticsAddToCart", cartEvents.length.toLocaleString());
-      setText("analyticsCheckoutVisits", checkoutEvents.length.toLocaleString());
-      setText("analyticsSessions", analyticsCountUnique(events, "session_id").toLocaleString());
-      setText("analyticsTotalEvents", events.length.toLocaleString());
+      setText("analyticsPageViews", Number(metrics.page_views || 0).toLocaleString());
+      setText("analyticsVisitors", Number(metrics.unique_visitors || 0).toLocaleString());
+      setText("analyticsProductViews", Number(metrics.product_views || 0).toLocaleString());
+      setText("analyticsAddToCart", Number(metrics.add_to_cart || 0).toLocaleString());
+      setText("analyticsCheckoutVisits", Number(metrics.checkout_visits || 0).toLocaleString());
+      setText("analyticsSessions", Number(metrics.sessions || 0).toLocaleString());
+      setText("analyticsTotalEvents", Number(metrics.total_events || 0).toLocaleString());
 
       if (table) {
-        const recent = events.slice(0, 50);
         const rows = recent.map(row => `
           <tr>
             <td>${escapeHTML(row.event_name.replace(/_/g, " "))}</td>
@@ -2105,8 +2096,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (status) {
-        status.textContent = events.length
-          ? `Showing ${events.length.toLocaleString()} recorded events (up to 5,000) for the selected period.`
+        status.textContent = Number(metrics.total_events || 0)
+          ? `Connected. Showing the latest ${recent.length} recorded events for the selected period.`
           : "Connected successfully. No events have been recorded in this period yet.";
       }
 
