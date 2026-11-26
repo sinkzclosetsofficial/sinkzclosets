@@ -87,7 +87,7 @@
                     BUSINESS.airtel.accountName = airtel.recipient_name || BUSINESS.airtel.accountName;
                     if (airtel.app_url) BUSINESS.airtel.appUrls[0] = airtel.app_url;
                 }
-                if (whatsapp?.phone_number) BUSINESS.whatsapp = whatsapp.phone_number.replace(/\\D/g, "");
+                if (whatsapp?.phone_number) { const digits = whatsapp.phone_number.replace(/\\D/g, ""); BUSINESS.whatsapp = digits.startsWith("0") ? "260" + digits.slice(1) : digits; }
             }
         } catch (error) {
             console.warn("Could not load live business contact settings; using verified fallback details.", error);
