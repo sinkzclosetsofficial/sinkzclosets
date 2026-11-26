@@ -2628,7 +2628,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const id = $("contactPaymentId")?.value;
     const request = id
       ? db.from("business_contact_payment_settings").update(payload).eq("id", id)
-      : db.from("business_contact_payment_settings").insert({...payload, created_by: currentUser?.id || null});
+      : db.from("business_contact_payment_settings").insert(payload);
 
     const { error } = await request;
     if (error) {
