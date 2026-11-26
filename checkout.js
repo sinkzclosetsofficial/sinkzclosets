@@ -35,18 +35,18 @@
         }
 
         const BUSINESS = {
-            whatsapp: "260973114929",
+            whatsapp: "26097315929",
 
             mtn: {
                 name: "MTN MoMo",
-                number: "+260960451691",
+                number: "+260765633293",
                 accountName: "Josias Sinkonde",
                 appUrl: "https://appbiz.momo.africa"
             },
 
             airtel: {
                 name: "Airtel Money",
-                number: "+260973114929",
+                number: "+26097315929",
                 accountName: "Josias Sinkonde",
                 appUrls: [
                     "https://airtelafrica.onelink.me",
