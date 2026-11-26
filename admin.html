@@ -1622,8 +1622,27 @@ input[type="checkbox"] {
             <span>Manage promotional campaigns.</span>
           </div>
           <section class="admin-panel">
-            <p>Discount creation and checkout validation require their own database and storefront integration.</p>
+            <h3 id="discountFormHeading">Create discount campaign</h3>
+            <form id="discountCampaignForm" class="admin-form-grid">
+              <input type="hidden" id="discountEditId">
+              <div><label for="discountName">Campaign name *</label><input id="discountName" required maxlength="120"></div>
+              <div><label for="discountCode">Discount code *</label><input id="discountCode" required maxlength="40" autocapitalize="characters" placeholder="e.g. WELCOME10"></div>
+              <div class="form-span-two"><label for="discountDescription">Description</label><textarea id="discountDescription" rows="2" maxlength="500"></textarea></div>
+              <div><label for="discountType">Discount type</label><select id="discountType"><option value="percentage">Percentage (%)</option><option value="fixed">Fixed amount</option></select></div>
+              <div><label for="discountValue">Discount value *</label><input id="discountValue" type="number" min="0.01" step="0.01" required></div>
+              <div><label for="discountCurrency">Currency</label><select id="discountCurrency"><option value="ZMW">ZMW</option><option value="ZAR">ZAR</option></select></div>
+              <div><label for="discountMax">Maximum discount (optional)</label><input id="discountMax" type="number" min="0.01" step="0.01"></div>
+              <div><label for="discountMinimum">Minimum subtotal</label><input id="discountMinimum" type="number" min="0" step="0.01" value="0"></div>
+              <div><label for="discountScope">Applies to</label><select id="discountScope"><option value="all">Entire cart</option><option value="category">Specific category</option><option value="product">Specific product</option></select></div>
+              <div id="discountCategoryWrap" hidden><label for="discountCategory">Category *</label><select id="discountCategory"></select></div>
+              <div id="discountProductWrap" hidden><label for="discountProduct">Product *</label><select id="discountProduct"></select></div>
+              <div><label for="discountStarts">Starts *</label><input id="discountStarts" type="datetime-local" required></div>
+              <div><label for="discountEnds">Ends *</label><input id="discountEnds" type="datetime-local" required></div>
+              <div><label for="discountActive">Campaign status</label><select id="discountActive"><option value="true">Active</option><option value="false">Paused</option></select></div>
+              <div class="form-span-two"><button type="submit" class="primary-button" id="saveDiscountButton">Save campaign</button> <button type="button" id="cancelDiscountEdit">Clear form</button><p id="discountMessage" class="form-message" role="status"></p></div>
+            </form>
           </section>
+          <section class="admin-panel"><div id="discountCampaignList"><p class="empty-message">Open Discounts to load campaigns.</p></div></section>
         </section>
 
 
