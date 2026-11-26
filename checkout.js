@@ -12,7 +12,7 @@
 (function () {
     "use strict";
 
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", async function () {
         const store = window.SinkzStore;
 
         const form = document.getElementById("checkoutForm");
@@ -70,6 +70,28 @@
                 }
             }
         };
+
+        try {
+            const liveSettings = await window.SinkzBusinessSettings?.load?.();
+            if (liveSettings) {
+                const mtn = liveSettings.find(x => x.setting_type === "payment" && x.provider === "mtn");
+                const airtel = liveSettings.find(x => x.setting_type === "payment" && x.provider === "airtel");
+                const whatsapp = liveSettings.find(x => x.setting_type === "whatsapp");
+                if (mtn) {
+                    BUSINESS.mtn.number = mtn.phone_number;
+                    BUSINESS.mtn.accountName = mtn.recipient_name || BUSINESS.mtn.accountName;
+                    if (mtn.app_url) BUSINESS.mtn.appUrl = mtn.app_url;
+                }
+                if (airtel) {
+                    BUSINESS.airtel.number = airtel.phone_number;
+                    BUSINESS.airtel.accountName = airtel.recipient_name || BUSINESS.airtel.accountName;
+                    if (airtel.app_url) BUSINESS.airtel.appUrls[0] = airtel.app_url;
+                }
+                if (whatsapp?.phone_number) BUSINESS.whatsapp = whatsapp.phone_number.replace(/\\D/g, "");
+            }
+        } catch (error) {
+            console.warn("Could not load live business contact settings; using verified fallback details.", error);
+        }
 
         let currentCart = [];
         let currentCurrency = "ZMW";
