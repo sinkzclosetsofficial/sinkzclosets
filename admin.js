@@ -2060,15 +2060,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const start = analyticsPeriodStart();
       const { data, error } = await db.rpc("get_analytics_report", {
-        p_since: start
+        p_since: analyticsPeriodStart()
       });
       if (error) throw error;
 
       const report = data || {};
       const metrics = report.metrics || {};
-      const recent = Array.isArray(report.recent_events) ? report.recent_events : [];
+      const events = Array.isArray(report.recent_events) ? report.recent_events : [];
 
       setText("analyticsPageViews", Number(metrics.page_views || 0).toLocaleString());
       setText("analyticsVisitors", Number(metrics.unique_visitors || 0).toLocaleString());
@@ -2079,9 +2078,9 @@ document.addEventListener("DOMContentLoaded", () => {
       setText("analyticsTotalEvents", Number(metrics.total_events || 0).toLocaleString());
 
       if (table) {
-        const rows = recent.map(row => `
+        const rows = events.map(row => `
           <tr>
-            <td>${escapeHTML(row.event_name.replace(/_/g, " "))}</td>
+            <td>${escapeHTML(String(row.event_name || "—").replace(/_/g, " "))}</td>
             <td>${escapeHTML(row.page_path || "—")}</td>
             <td>${escapeHTML(row.product_name || row.product_id || "—")}</td>
             <td>${escapeHTML(row.device || "—")}</td>
@@ -2097,10 +2096,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (status) {
         status.textContent = Number(metrics.total_events || 0)
-          ? `Connected. Showing the latest ${recent.length} recorded events for the selected period.`
+          ? `Connected. Showing ${events.length} recent events; totals are calculated from all matching records.`
           : "Connected successfully. No events have been recorded in this period yet.";
       }
-
     } catch (error) {
       console.error("Analytics load failed:", error);
       ["analyticsPageViews","analyticsVisitors","analyticsProductViews","analyticsAddToCart","analyticsCheckoutVisits","analyticsSessions","analyticsTotalEvents"]
