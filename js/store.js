@@ -571,6 +571,8 @@
                 name: item.name || "Product",
                 image: item.image || "",
                 category: item.category || "",
+                size: item.size || "",
+                colour: item.colour || "",
                 quantity: validQuantity(item.quantity) || 1,
                 currency: currency
             };
@@ -1330,9 +1332,14 @@
         add.type = "button";
         add.className = "btn btn-primary";
 
+        const hasVariants = Boolean(
+            String(product.sizes || "").trim() ||
+            String(product.colours || "").trim()
+        );
+
         add.textContent = product.priceUnavailable
             ? "Price unavailable"
-            : "Add to Cart";
+            : (hasVariants ? "Choose Options" : "Add to Cart");
 
         add.disabled = Boolean(product.priceUnavailable);
 
@@ -1345,6 +1352,11 @@
         }
 
         add.addEventListener("click", function () {
+            if (hasVariants) {
+                window.location.href = "product.html?id=" +
+                    encodeURIComponent(product.id);
+                return;
+            }
             addToCart(product.id, 1);
         });
 
