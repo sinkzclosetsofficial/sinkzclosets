@@ -517,6 +517,13 @@
 
                 name.textContent = item.name || "Product";
 
+                const variantText = document.createElement("p");
+                variantText.className = "muted";
+                const variantLabels = [];
+                if (item.size) variantLabels.push("Size: " + item.size);
+                if (item.colour) variantLabels.push("Colour: " + item.colour);
+                variantText.textContent = variantLabels.join(" · ");
+
                 const priceText = document.createElement("p");
 
                 priceText.className = "muted";
@@ -622,6 +629,7 @@
                 });
 
                 details.appendChild(name);
+                if (variantText.textContent) details.appendChild(variantText);
                 details.appendChild(priceText);
 
                 row.appendChild(details);
