@@ -17,6 +17,11 @@
         const productCategory = document.getElementById("productCategory");
         const productPrice = document.getElementById("productPrice");
         const productDescription = document.getElementById("productDescription");
+        const variantFields = document.getElementById("productVariantFields");
+        const sizeField = document.getElementById("productSizeField");
+        const sizeSelect = document.getElementById("productSize");
+        const colourField = document.getElementById("productColourField");
+        const colourSelect = document.getElementById("productColour");
         const productQuantity = document.getElementById("productQuantity");
         const addButton = document.getElementById("addProductToCart");
         const productNotFound = document.getElementById("productNotFound");
@@ -111,7 +116,47 @@
         document.title = (product.name || "Product") + " | Sinkzclosets";
 
         // -------------------------------------------------
-        // 5. ADD SELECTED QUANTITY TO CART
+        // 5. RENDER ADMIN-DEFINED SIZE AND COLOUR OPTIONS
+        // -------------------------------------------------
+
+        function parseOptions(value) {
+            return String(value || "").split(/[\n,]+/)
+                .map(function (option) { return option.trim(); })
+                .filter(Boolean);
+        }
+
+        function fillOptions(select, options, placeholder) {
+            if (!select) return;
+            select.replaceChildren();
+            const first = document.createElement("option");
+            first.value = "";
+            first.textContent = placeholder;
+            select.appendChild(first);
+            options.forEach(function (option) {
+                const choice = document.createElement("option");
+                choice.value = option;
+                choice.textContent = option;
+                select.appendChild(choice);
+            });
+        }
+
+        const sizes = parseOptions(product.sizes);
+        const colours = parseOptions(product.colours);
+
+        if (sizes.length || colours.length) {
+            if (variantFields) variantFields.hidden = false;
+            if (sizes.length) {
+                if (sizeField) sizeField.hidden = false;
+                fillOptions(sizeSelect, sizes, "Select a size");
+            }
+            if (colours.length) {
+                if (colourField) colourField.hidden = false;
+                fillOptions(colourSelect, colours, "Select a colour");
+            }
+        }
+
+        // -------------------------------------------------
+        // 6. ADD SELECTED QUANTITY TO CART
         // -------------------------------------------------
         // Use the central store so stock, currency, quantity,
         // repricing and cart validation remain consistent.
@@ -126,7 +171,23 @@
                     return;
                 }
 
-                const added = window.SinkzStore.addToCart(product.id, quantity);
+                const selectedOptions = {
+                    size: sizeSelect && sizeField && !sizeField.hidden ? sizeSelect.value : "",
+                    colour: colourSelect && colourField && !colourField.hidden ? colourSelect.value : ""
+                };
+
+                if (sizes.length && !selectedOptions.size) {
+                    alert("Please choose a size before adding this product.");
+                    sizeSelect.focus();
+                    return;
+                }
+                if (colours.length && !selectedOptions.colour) {
+                    alert("Please choose a colour before adding this product.");
+                    colourSelect.focus();
+                    return;
+                }
+
+                const added = window.SinkzStore.addToCart(product.id, quantity, selectedOptions);
 
                 if (added) {
                     alert(quantity + " × " + product.name + " added to your cart.");
