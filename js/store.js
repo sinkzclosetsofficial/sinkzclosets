@@ -630,7 +630,7 @@
        7. ADD TO CART
     ===================================================== */
 
-    function addToCart(productId, quantity) {
+    function addToCart(productId, quantity, selectedOptions) {
         const product = getRawProducts().find(
             function (item) {
                 return String(item.id) === String(productId);
@@ -674,11 +674,34 @@
             return false;
         }
 
+        selectedOptions = selectedOptions || {};
+        const selectedSize = String(selectedOptions.size || "").trim();
+        const selectedColour = String(selectedOptions.colour || "").trim();
+        const allowedSizes = String(product.sizes || "").split(/[\n,]+/).map(value => value.trim()).filter(Boolean);
+        const allowedColours = String(product.colours || "").split(/[\n,]+/).map(value => value.trim()).filter(Boolean);
+
+        if (allowedSizes.length && !allowedSizes.includes(selectedSize)) {
+            alert("Please choose an available size.");
+            return false;
+        }
+        if (allowedColours.length && !allowedColours.includes(selectedColour)) {
+            alert("Please choose an available colour.");
+            return false;
+        }
+
         const cart = getCart();
 
         const existing = cart.find(function (item) {
             return String(item.id) === String(productId);
         });
+
+        if (existing && (
+            String(existing.size || "") !== selectedSize ||
+            String(existing.colour || "") !== selectedColour
+        )) {
+            alert("This product is already in your cart with a different size or colour. Remove it first if you want to change your selection.");
+            return false;
+        }
 
         const existingQuantity = existing
             ? Number(existing.quantity)
@@ -705,6 +728,8 @@
                 name: product.name,
                 image: product.image || "",
                 category: product.category || "",
+                size: selectedSize,
+                colour: selectedColour,
                 quantity: amount,
                 currency: currency
             });
@@ -1004,6 +1029,13 @@
 
             name.textContent = item.name;
 
+            const variant = document.createElement("p");
+            variant.className = "muted";
+            const variantLabels = [];
+            if (item.size) variantLabels.push("Size: " + item.size);
+            if (item.colour) variantLabels.push("Colour: " + item.colour);
+            variant.textContent = variantLabels.join(" · ");
+
             const quantity = document.createElement("p");
 
             quantity.className = "muted";
@@ -1041,6 +1073,7 @@
                 item.availabilityStatus;
 
             details.appendChild(name);
+            if (variant.textContent) details.appendChild(variant);
             details.appendChild(quantity);
             details.appendChild(amount);
             details.appendChild(availability);
