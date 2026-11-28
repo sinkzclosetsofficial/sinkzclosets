@@ -1469,12 +1469,16 @@ html[data-theme="light"] .login-card { background: #ffffff; }
 
               <div>
                 <label for="adminProductSizes">Available sizes</label>
-                <input id="adminProductSizes" type="text" placeholder="S, M, L, 38, 39">
+                <textarea id="adminProductSizes" rows="5"
+                  placeholder="S&#10;M&#10;L&#10;XL&#10;38&#10;39"></textarea>
+                <small class="muted">Enter one size per line. Leave blank if this product has no sizes. You can add, edit or remove lines whenever you update the product.</small>
               </div>
 
               <div>
                 <label for="adminProductColours">Available colours</label>
-                <input id="adminProductColours" type="text" placeholder="Black, White, Blue">
+                <textarea id="adminProductColours" rows="5"
+                  placeholder="Black&#10;White&#10;Blue"></textarea>
+                <small class="muted">Enter one colour per line. You can add, edit or remove lines whenever you update the product.</small>
               </div>
 
               <div>
