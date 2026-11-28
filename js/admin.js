@@ -1453,8 +1453,8 @@ document.addEventListener("DOMContentLoaded", () => {
       setValue("adminProductPriceZAR", product.price_zar ?? "");
       setValue("adminProductStock", product.stock);
       // Show legacy comma-separated values as editable one-per-line options.
-      setValue("adminProductSizes", String(product.sizes || "").split(/[\\n,]+/).map(value => value.trim()).filter(Boolean).join("\\n"));
-      setValue("adminProductColours", String(product.colours || "").split(/[\\n,]+/).map(value => value.trim()).filter(Boolean).join("\\n"));
+      setValue("adminProductSizes", String(product.sizes || "").split(/[\n,]+/).map(value => value.trim()).filter(Boolean).join("\n"));
+      setValue("adminProductColours", String(product.colours || "").split(/[\n,]+/).map(value => value.trim()).filter(Boolean).join("\n"));
       setValue("adminProductStatus", product.status);
       setValue("adminProductFeatured", String(product.featured));
       setValue("adminProductDescription", product.description);
