@@ -291,8 +291,12 @@
                 row.className = "checkout-line";
 
                 const description = document.createElement("span");
+                const selectedDetails = [];
+                if (item.size) selectedDetails.push("Size: " + item.size);
+                if (item.colour) selectedDetails.push("Colour: " + item.colour);
                 description.textContent =
                     (item.name || "Product") +
+                    (selectedDetails.length ? " (" + selectedDetails.join(", ") + ")" : "") +
                     " × " + (Number(item.quantity) || 0);
 
                 const amount = document.createElement("strong");
@@ -675,6 +679,8 @@
 
                 message +=
                     "- " + item.name +
+                    (item.size ? " | Size: " + item.size : "") +
+                    (item.colour ? " | Colour: " + item.colour : "") +
                     " | Quantity: " + item.quantity +
                     " | " + formatPrice(lineTotal) + "\n";
             });
